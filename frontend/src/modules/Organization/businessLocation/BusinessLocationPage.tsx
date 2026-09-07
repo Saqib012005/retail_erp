@@ -7,6 +7,8 @@ import BusinessLocationTable from './components/BusinessLocationTable'
 import Pagination from '../components/Pagination'
 import { useBusinessLocations ,useDeleteBusinessLocation} from '@/hooks/admin/organization/useBusinessLocation'
 import { exportToPDF, ExportColumn } from '@/utils/exportData'
+ import { useQueryClient } from '@tanstack/react-query';     
+import {deleteBusinessLocation} from '@/services/admin/organization/businessLocation.service'
 
 const ROWS_PER_PAGE = 10
 type ViewMode = 'list' | 'create' | 'edit'
@@ -25,6 +27,7 @@ const businessLocationColumns: ExportColumn<BusinessLocationRow>[] = [
 ]
 
 function BusinessLocationPage() {
+  const queryClient = useQueryClient(); 
   const deleteMutation = useDeleteBusinessLocation()
   const [view, setView] = useState<ViewMode>('list')
 const [selectedLocation, setSelectedLocation] =
@@ -65,14 +68,15 @@ const handleDelete = async (
   row: BusinessLocationRow
 ) => {
   try {
-    await deleteMutation.mutateAsync(row.id)
-
+    await deleteBusinessLocation(row.id)
+     await queryClient.invalidateQueries({
+      queryKey: ['businessLocations'],
+    });
     toast.success(
       'Business location deleted successfully'
     )
   } catch (error) {
     console.error('Delete error:', error)
-
     toast.error(
       'Failed to delete business location'
     )
