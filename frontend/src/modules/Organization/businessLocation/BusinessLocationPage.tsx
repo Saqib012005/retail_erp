@@ -6,14 +6,15 @@ import type { BusinessLocationRow } from '../../../types/admin/organization/busi
 import BusinessLocationTable from './components/BusinessLocationTable'
 import Pagination from '../components/Pagination'
 import { useBusinessLocations ,useDeleteBusinessLocation} from '@/hooks/admin/organization/useBusinessLocation'
-
-
+ import { useQueryClient } from '@tanstack/react-query';     
+import {deleteBusinessLocation} from '@/services/admin/organization/businessLocation.service'
 
 const ROWS_PER_PAGE = 10
 type ViewMode = 'list' | 'create' | 'edit'
 
 
 function BusinessLocationPage() {
+  const queryClient = useQueryClient(); 
   const deleteMutation = useDeleteBusinessLocation()
   const [view, setView] = useState<ViewMode>('list')
 const [selectedLocation, setSelectedLocation] =
@@ -33,16 +34,10 @@ const {
   //isError: isBusinessLocationsError,
  // error: businessLocationsError,
 } = useBusinessLocations();
-
-console.log("🔥 Business Locations:", businessLocations);
-  
-
-
-
   const filteredLocations = useMemo(() => {
     const term = searchTerm.toLowerCase().trim()
     if (!term) return locations
-    return locations.filter((loc) =>
+    return locations.filter((loc:any) =>
       [loc.locationName, loc.code, loc.city, loc.state].some((field) =>
         field.toLowerCase().includes(term),
       ),
@@ -68,14 +63,15 @@ const handleDelete = async (
   row: BusinessLocationRow
 ) => {
   try {
-    await deleteMutation.mutateAsync(row.id)
-
+    await deleteBusinessLocation(row.id)
+     await queryClient.invalidateQueries({
+      queryKey: ['businessLocations'],
+    });
     toast.success(
       'Business location deleted successfully'
     )
   } catch (error) {
     console.error('Delete error:', error)
-
     toast.error(
       'Failed to delete business location'
     )
