@@ -6,6 +6,7 @@ import AccountingYearForm from "./components/AccountingYearForm";
 import { AccountingYear, Period, PeriodStatus } from "@/types/accounting";
 import apiClient from "@/services/apiClient";
 import toast from "react-hot-toast"; // or your toast lib
+import { formatDateRange } from "@/utils/dateFormat";
 import { Plus } from "lucide-react";
 
 
@@ -25,19 +26,7 @@ export default function AccountingYearPage() {
         (year: any) => ({
           id: year.id,
           label: year.yearName,
-          dateRange: `${new Date(year.fromDate).toLocaleDateString("en-GB", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-          })} — ${new Date(year.toDate).toLocaleDateString("en-GB", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-          })}`,
-          createdBy:year.createdBy.name,
-          createdOn: year.createdBy.createdAt,
-          updatedBy: year.updatedBy?.name,
-          updatedOn: year.updatedBy?.updatedAt,
+          dateRange: formatDateRange(year.fromDate, year.toDate),
           status: year.status,
           closedPeriods: year.financeMonths.filter(
             (m: any) => m.financeStatus === "Closed",
@@ -60,20 +49,13 @@ export default function AccountingYearPage() {
   useEffect(() => {
     fetchAccountingYear();
   }, []);
-const getPeriodsForYear = (year?: AccountingYear): Period[] => {
-  if (!year) return [];
-  return year.financeMonths.map((month: any, idx: number) => {
-    
-    const now = new Date();
-    const start = new Date(month.startDate);
-    const end = new Date(month.endDate);
+  const getPeriodsForYear = (year?: AccountingYear): Period[] => {
+    if (!year) return [];
 
-    const formatDate = (d: Date) =>
-      d.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+    return year.financeMonths.map((month: any) => ({
+      month: month.period.split(" ")[0], // Jul
+      year: month.period.split(" ")[1], // 2026
 
-    return {
-      month: month.period.split(" ")[0],   // "Jul"
-      year: month.period.split(" ")[1],    // "2026"
       status: month.financeStatus as PeriodStatus,
       sequenceNumber: `#${String(idx + 1).padStart(2, "0")}`,
       accountingYear: year.label,
