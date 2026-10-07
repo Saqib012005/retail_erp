@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom"
 import { useAuth } from "../context/AuthContext"
+import LoginForm from "../modules/auth/pages/LoginForm"
 import DashBoardLayout from "../layouts/DashBoardLayout"
 import DashBoard from "../modules/dashboard/pages/DashBoard"
 import OrganizationGroup from '../modules/Organization/OrganizationGroup/OrganizationGroup'
@@ -27,10 +28,6 @@ import DataImport from "@/modules/Utilities/pages/DataImport"
 import EInvoice from "@/modules/Utilities/pages/EInvoice"
 import EWayBill from "@/modules/Utilities/pages/EWayBill"
 import UserLicenses from "@/modules/Securities/pages/UserLicenses"
-import Inventory from '../modules/Inventory/Inventory'
-import InventoryDashboard from '../modules/Inventory/pages/InventoryDashboard'
-import ProductSetup from '../modules/Inventory/pages/ProductSetup'
-import ModulePlaceholder from '../modules/Inventory/pages/ModulePlaceholder'
 
 export default function AppRoutes() {
 const { isLoggedIn } = useAuth() 
@@ -40,14 +37,24 @@ console.log("isLoggedIn:", isLoggedIn);
   
   return (
   <Routes>
-    {/* Public Route - Bypassed: always redirects to dashboard */}
+    {/* Public Route */}
     <Route
       path="/login"
-      element={<Navigate to="/dashboard" replace />}
+      element={
+        isLoggedIn ? <Navigate to="/dashboard" replace /> : <LoginForm />
+      }
     />
 
     {/* Protected Layout */}
-    <Route element={<DashBoardLayout />}>
+    <Route
+      element={
+        isLoggedIn ? (
+          <DashBoardLayout />
+        ) : (
+          <Navigate to="/login" replace />
+        )
+      }
+    >
       <Route path="/dashboard" element={<DashBoard />} />
 
       <Route path="/organization">
@@ -80,18 +87,6 @@ console.log("isLoggedIn:", isLoggedIn);
         <Route path="data-import" element={<DataImport />} />
         <Route path="e-invoice" element={<EInvoice />} />
         <Route path="e-way-bill" element={<EWayBill />} />
-      </Route>
-
-      <Route path="/inventory" element={<Inventory />}>
-        <Route index element={<Navigate to="dashboard" replace />} />
-        <Route path="dashboard" element={<InventoryDashboard />} />
-        <Route path="product-setup/*" element={<ProductSetup />} />
-        <Route path="product-setup" element={<Navigate to="product-setup/products" replace />} />
-        <Route path="warehouse-management" element={<ModulePlaceholder title="Warehouse Management" description="Manage warehouses, zones, bins, and capacity." />} />
-        <Route path="inventory-management" element={<ModulePlaceholder title="Inventory Management" description="Manage stock levels, valuations, and replenishment." />} />
-        <Route path="inventory-operations" element={<ModulePlaceholder title="Inventory Operations" description="Manage goods receipts, issues, transfers, and adjustments." />} />
-        <Route path="reports" element={<ModulePlaceholder title="Inventory Reports" description="Comprehensive stock, aging, movement, and discrepancy reports." />} />
-        <Route path="configuration" element={<ModulePlaceholder title="Configuration" description="Inventory settings, policies, and system parameters." />} />
       </Route>
     </Route>
 
