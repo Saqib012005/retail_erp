@@ -1,4 +1,4 @@
-import {Request,Response } from 'express'
+import { Request, Response } from 'express'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import prisma from '../../config/prisma.js'
@@ -74,18 +74,18 @@ export const login = async (req: Request, res: Response) => {
     )
 
     return res.json({
-            message : ' Login Successful!',
-            token,
+      message: ' Login Successful!',
+      token,
 
-            user:{
-                id:user.id,
-                email:user.email,
-                  name: user.name,
-    role: user.role
-            },
-        
-        })
-    
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role
+      },
+
+    })
+
   } catch (error) {
     return res.status(500).json({ message: 'Login failed' })
   }

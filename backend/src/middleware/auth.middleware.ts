@@ -15,18 +15,12 @@ export const authMiddleware = (
 ) => {
   try {
     const authHeader = req.headers.authorization;
-    console.log("Authorization Header:", authHeader);
-    // console.log(localStorage.getItem('token'))
-    //console.log('token',authHeader.split(" ")[1])
     if (!authHeader) {
       return res.status(401).json({
         message: "Authorization Token missing",
       });
     }
     const token = authHeader.split(" ")[1];
-    console.log("Extracted Token:", token);
-
-    console.log("token", token);
     const decoded = jwt.verify(
       token,
       process.env.JWT_SECRET || "erp secrete",
@@ -43,7 +37,6 @@ export const authMiddleware = (
 
     next();
   } catch (error: any) {
-    console.log("JWT Error:", error.message);
 
     return res.status(401).json({
       message: "Invalid token",
