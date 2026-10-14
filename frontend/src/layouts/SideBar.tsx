@@ -79,7 +79,7 @@ export default function Sidebar({ open = false, onClose }: SidebarProps) {
         </button>
 
         {/* Nav */}
-        <nav className="min-h-0 flex-1 space-y-1 overflow-y-auto pb-4">
+        <nav className="min-h-0 flex-1 space-y-1 overflow-y-auto pb-4 hide-scrollbar">
           {MODULE_ROUTES.map((module) => {
             const Icon = module.icon;
             const isActive = location.pathname.startsWith(module.basePath);
