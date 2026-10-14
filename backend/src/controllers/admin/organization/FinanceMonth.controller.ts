@@ -35,7 +35,7 @@ export const getFinanceMonthsController = async (
 ) => {
   try {
     
-    const id = Number(req.params.id);
+   
 
     const result = await getFinanceMonths();
 
@@ -67,7 +67,7 @@ export const getFinanceMonthByIdController = async (
 
     const result = await getFinanceMonthById(id);
 
-    if (!result) {
+   if (result.length === 0) {
       return res.status(404).json({
         message: "Finance data not found",
       });

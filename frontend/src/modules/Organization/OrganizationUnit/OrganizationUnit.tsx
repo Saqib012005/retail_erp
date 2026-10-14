@@ -10,6 +10,10 @@ import apiClient from '../../../services/apiClient'
 import { exportToPDF, exportToCSV, ExportColumn } from '@/utils/exportData'
 import toast from "react-hot-toast"
 
+import { useAuth } from "@/context/AuthContext";
+import Can from "@/context/Can";
+
+
 export interface OrganizationUnit {
   id: number;
   organizationUnit: string;
@@ -45,6 +49,11 @@ const orgUnitColumns: ExportColumn<OrganizationUnit>[] = [
 
 
 function OrganizationUnit() {
+
+  const { hasPermission } = useAuth();
+
+  
+
   const [units, setUnits] =  useState<OrganizationUnit[]>([]);
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all")
@@ -189,6 +198,9 @@ const fetchUnits = async () => {
   }
 
   return (
+
+
+
     <div className="page-shell">
       <div className="page-header">
         <div>
@@ -197,6 +209,7 @@ const fetchUnits = async () => {
             {filteredUnits.length} {filteredUnits.length === 1? 'unit' : 'units'} across all groups
           </p>
         </div>
+        
         <div className="page-actions">
           <div className="relative" ref={exportRef}>
           <button 
