@@ -49,7 +49,7 @@ app.use('/api/utilities/ledgers', ledgerImportRoutes);
 app.use('/api/utilities/subledgers', subLedgerImportRoutes);
 app.use('/api/utilities/e-invoice', eInvoiceRoutes);
 app.use('/api/utilities/e-way-bill', eWayBillRoutes);
-app.use('/api/securities', securityRoutes);
+//app.use('/api/securities', securityRoutes);
 
 
 export default app;
