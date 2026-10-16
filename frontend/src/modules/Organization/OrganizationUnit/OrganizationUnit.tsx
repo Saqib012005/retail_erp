@@ -9,7 +9,6 @@ import { OrgUnitFormData } from "@/components/forms/validate.schema"
 import apiClient from '../../../services/apiClient'
 import { exportToPDF, exportToCSV, ExportColumn } from '@/utils/exportData'
 import toast from "react-hot-toast"
-
 import { useAuth } from "@/context/AuthContext";
 import Can from "@/context/Can";
 
@@ -50,9 +49,32 @@ const orgUnitColumns: ExportColumn<OrganizationUnit>[] = [
 
 function OrganizationUnit() {
 
-  const { hasPermission } = useAuth();
+  const { hasPermission, permissions, user } = useAuth();
+
+  console.log("Current user:", user);
+  console.log("Current permissions:", permissions);
+  console.log(
+    "Can view Org Unit:",
+    hasPermission("ORG_UNIT_VIEW")
+  );
 
   
+
+  
+//This RBAC check ensures that only users with the "ORG_UNIT_VIEW" permission can access the Organization Unit page. If a user lacks this permission, they will see a message indicating that they do not have access to view Organization Units.
+    if (!hasPermission("ORG_UNIT_VIEW")) {
+    return (
+      <div className="p-6 text-center text-red-600">
+        You do not have permission to view Organization Units.
+      </div>
+    );
+  }
+
+  return <OrganizationUnitContent />;
+}
+
+
+ function OrganizationUnitContent() {
 
   const [units, setUnits] =  useState<OrganizationUnit[]>([]);
   const [searchTerm, setSearchTerm] = useState("")
@@ -119,6 +141,9 @@ const fetchUnits = async () => {
   const startIndex = (currentPage - 1) * rowsPerPage
   const currentUnits = filteredUnits.slice(startIndex, startIndex + rowsPerPage)
 
+
+
+  
   const handleAddClick = () => {
     setEditingUnit(null)
     setIsModalOpen(true)
@@ -198,9 +223,6 @@ const fetchUnits = async () => {
   }
 
   return (
-
-
-
     <div className="page-shell">
       <div className="page-header">
         <div>
@@ -336,6 +358,5 @@ const fetchUnits = async () => {
       </Modal>
     </div>
   )
-}
-
+ }
 export default OrganizationUnit

@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom"
 import { useAuth } from "../context/AuthContext"
 import DashBoardLayout from "../layouts/DashBoardLayout"
+import LoginForm from "../modules/auth/pages/LoginForm"
 import DashBoard from "../modules/dashboard/pages/DashBoard"
 import OrganizationGroup from '../modules/Organization/OrganizationGroup/OrganizationGroup'
 import OrganizationUnit from '../modules/Organization/OrganizationUnit/OrganizationUnit';
@@ -33,21 +34,21 @@ import ProductSetup from '../modules/Inventory/pages/ProductSetup'
 import ModulePlaceholder from '../modules/Inventory/pages/ModulePlaceholder'
 
 export default function AppRoutes() {
-const { isLoggedIn } = useAuth() 
-
-//console.log("Token:", token);
-console.log("isLoggedIn:", isLoggedIn);
+  const { isLoggedIn } = useAuth()
   
   return (
   <Routes>
-    {/* Public Route - Bypassed: always redirects to dashboard */}
     <Route
       path="/login"
-      element={<Navigate to="/dashboard" replace />}
+      element={isLoggedIn ? <Navigate to="/dashboard" replace /> : <LoginForm />}
     />
 
     {/* Protected Layout */}
-    <Route element={<DashBoardLayout />}>
+    <Route
+      element={
+        isLoggedIn ? <DashBoardLayout /> : <Navigate to="/login" replace />
+      }
+    >
       <Route path="/dashboard" element={<DashBoard />} />
 
       <Route path="/organization">
@@ -96,8 +97,14 @@ console.log("isLoggedIn:", isLoggedIn);
     </Route>
 
     {/* Default Route */}
-    <Route path="/" element={<Navigate to="/dashboard" replace />} />
-    <Route path="*" element={<Navigate to="/dashboard" replace />} />
+    <Route
+      path="/"
+      element={<Navigate to={isLoggedIn ? "/dashboard" : "/login"} replace />}
+    />
+    <Route
+      path="*"
+      element={<Navigate to={isLoggedIn ? "/dashboard" : "/login"} replace />}
+    />
   </Routes>
 );
 }

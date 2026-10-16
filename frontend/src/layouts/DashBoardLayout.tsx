@@ -1,16 +1,24 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import Sidebar from "@/layouts/SideBar";
 import Topbar from "@/layouts/TopBar";
 
 function DashBoardLayout() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
+  const [sidebarOpenPath, setSidebarOpenPath] = useState<string | null>(null);
+  const sidebarOpen = sidebarOpenPath === location.pathname;
+  const sidebarRef = useRef<HTMLElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
 
-  // Close mobile drawer on route change
-  useEffect(() => {
-    setSidebarOpen(false);
-  }, [location.pathname]);
+  const closeSidebar = useCallback(() => {
+    if (
+      sidebarRef.current?.contains(document.activeElement) &&
+      menuButtonRef.current?.getClientRects().length
+    ) {
+      menuButtonRef.current.focus();
+    }
+    setSidebarOpenPath(null);
+  }, []);
 
   // Prevent body scroll when mobile drawer is open
   useEffect(() => {
@@ -24,7 +32,11 @@ function DashBoardLayout() {
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans">
-      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <Sidebar
+        ref={sidebarRef}
+        open={sidebarOpen}
+        onClose={closeSidebar}
+      />
 
       {/* Mobile overlay */}
       {sidebarOpen && (
@@ -32,12 +44,15 @@ function DashBoardLayout() {
           type="button"
           aria-label="Close navigation"
           className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-[1px] lg:hidden"
-          onClick={() => setSidebarOpen(false)}
+          onClick={closeSidebar}
         />
       )}
 
       <div className="flex min-h-screen flex-col lg:pl-72">
-        <Topbar onMenuClick={() => setSidebarOpen(true)} />
+        <Topbar
+          menuButtonRef={menuButtonRef}
+          onMenuClick={() => setSidebarOpenPath(location.pathname)}
+        />
         <main className="flex-1 overflow-x-hidden px-4 py-4 sm:px-6 sm:py-5 lg:px-8 lg:py-6">
           <Outlet />
         </main>

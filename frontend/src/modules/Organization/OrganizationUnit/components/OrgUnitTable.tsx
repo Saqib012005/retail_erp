@@ -1,5 +1,5 @@
 import { Pencil, Trash2 ,CheckCircle2, XCircle} from "lucide-react"
-//import type { OrgUnitFormData } from "@/components/forms/validate.schema"
+import Can from "@/context/Can";
 
 import type { OrganizationUnit } from "../OrganizationUnit";
 
@@ -79,22 +79,28 @@ export default function OrgUnitTable({ units,onEdit,onDelete,loading }: OrgUnitT
                 </td>
                 <td className="px-4 py-3">
                   <div className="flex items-center justify-end gap-2">
-                    <button
-                      onClick={() => onEdit(unit)}
-                      disabled={loading}
-                      className="p-1.5 rounded-lg  text-[#1ed2e2] hover:text-[#1ed2e2] transition"
-                      title="Edit"
-                    >
-                      <Pencil size={16} />
-                    </button>
-                    <button
-                      onClick={() => onDelete(unit)} 
-                      disabled={loading}
-                      className="text-[#EF4444] hover:text-[#DC2626] transition"
-                      title="Delete"
-                    >
+                      <Can permission="ORG_UNIT_EDIT">
+      <button
+        type="button"
+        onClick={() => onEdit(unit)}
+        disabled={loading}
+        className="p-1.5 rounded-lg text-[#1ed2e2] hover:text-[#1ed2e2] transition disabled:opacity-50"
+        title="Edit"
+        aria-label={`Edit ${unit.organizationUnit}`}
+      >
+        <Pencil size={16} />
+      </button>
+    </Can>
+                    <Can permission="ORG_UNIT_DELETE">
+                      <button
+                        onClick={() => onDelete(unit)} 
+                        disabled={loading}
+                        className="text-[#EF4444] hover:text-[#DC2626] transition"
+                        title="Delete"
+                      >
                       <Trash2 size={16} />
                     </button>
+                    </Can>
                   </div>
                 </td>
               </tr>

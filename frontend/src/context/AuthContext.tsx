@@ -50,13 +50,22 @@ export function AuthProvider({ children }: AuthProviderProps) {
     console.log("Before navigate:", window.location.pathname);
   }
 
-  const logout = () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
-    setToken(null)
-    setUser(null)
-    navigate('/login', { replace: true })
-  }
+ const logout = () => {
+  console.log("Logout clicked");
+
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+
+  console.log(
+    "Token after logout:",
+    localStorage.getItem("token")
+  );
+
+  setToken(null);
+  setUser(null);
+
+  navigate("/login", { replace: true });
+};
 
 
 

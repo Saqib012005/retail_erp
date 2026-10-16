@@ -1,12 +1,14 @@
 import { Search, Plus, Moon, Bell, Menu } from "lucide-react";
+import type { Ref } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { MODULE_ROUTES } from "@/config/navigationConfig";
 
 type TopbarProps = {
+  menuButtonRef?: Ref<HTMLButtonElement>;
   onMenuClick?: () => void;
 };
 
-function Topbar({ onMenuClick }: TopbarProps) {
+function Topbar({ menuButtonRef, onMenuClick }: TopbarProps) {
   const location = useLocation();
   const activeModule = MODULE_ROUTES.find((module) =>
     location.pathname.startsWith(module.basePath)
@@ -18,6 +20,7 @@ function Topbar({ onMenuClick }: TopbarProps) {
         <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           <button
             type="button"
+            ref={menuButtonRef}
             onClick={onMenuClick}
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 lg:hidden"
             aria-label="Open menu"

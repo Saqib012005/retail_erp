@@ -781,3 +781,31 @@ model EWayBill {
   @@map("e_way_bills")
   @@schema("finance")
 }
+
+
+enum AuditLogLevel {
+  INFO
+  SUCCESS
+  ERROR
+  WARNING
+
+  @@schema("public")
+}
+
+model AuditLog {
+  id          Int           @id @default(autoincrement())
+  level       AuditLogLevel @default(INFO)
+  action      String
+  module      String
+  userId      Int?
+  userName    String?
+  description String?
+  ipAddress   String?
+  createdAt   DateTime      @default(now())
+
+  @@index([createdAt])
+  @@index([module, createdAt])
+  @@index([userId, createdAt])
+  @@index([level, createdAt])
+  @@schema("public")
+}

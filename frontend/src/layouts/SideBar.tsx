@@ -1,4 +1,5 @@
 import { MODULE_ROUTES } from "@/config/navigationConfig";
+import { forwardRef, useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { LogOut, X } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
@@ -8,21 +9,37 @@ type SidebarProps = {
   onClose?: () => void;
 };
 
-export default function Sidebar({ open = false, onClose }: SidebarProps) {
-  const location = useLocation();
-  const { logout } = useAuth();
+const Sidebar = forwardRef<HTMLElement, SidebarProps>(
+  function Sidebar({ open = false, onClose }, ref) {
+    const location = useLocation();
+    const { logout } = useAuth();
+    const [isDesktop, setIsDesktop] = useState(() =>
+      window.matchMedia("(min-width: 1024px)").matches
+    );
 
-  return (
-    <aside
-      className={`
+    useEffect(() => {
+      const mediaQuery = window.matchMedia("(min-width: 1024px)");
+      const updateIsDesktop = () => setIsDesktop(mediaQuery.matches);
+
+      mediaQuery.addEventListener("change", updateIsDesktop);
+      return () => mediaQuery.removeEventListener("change", updateIsDesktop);
+    }, []);
+
+    const isHidden = !open && !isDesktop;
+
+    return (
+      <aside
+        ref={ref}
+        className={`
         fixed inset-y-0 left-0 z-50 flex w-[min(18rem,85vw)] flex-col
         bg-[#043793] text-white
         transition-transform duration-300 ease-out
         lg:translate-x-0
         ${open ? "translate-x-0" : "-translate-x-full"}
       `}
-      aria-hidden={!open}
-    >
+        aria-hidden={isHidden}
+        inert={isHidden}
+      >
       <div className="flex h-full flex-col px-4 pt-4 pb-4">
         {/* Brand */}
         <div className="mb-4 flex items-center justify-between gap-3">
@@ -121,6 +138,9 @@ export default function Sidebar({ open = false, onClose }: SidebarProps) {
           </button>
         </div>
       </div>
-    </aside>
-  );
-}
+      </aside>
+    );
+  }
+);
+
+export default Sidebar;

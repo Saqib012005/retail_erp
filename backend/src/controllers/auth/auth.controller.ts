@@ -43,50 +43,109 @@ export const register = async (req: Request, res: Response) => {
     return res.status(500).json({ error: error?.message || 'Registration failed' })
   }
 }
+
 export const login = async (req: Request, res: Response) => {
   try {
-    const body = req.body ?? {}
-    const email = typeof body.email === 'string' ? body.email.trim().toLowerCase() : ''
-    const password = typeof body.password === 'string' ? body.password : ''
+    const body = req.body ?? {};
+
+    const email =
+      typeof body.email === "string"
+        ? body.email.trim().toLowerCase()
+        : "";
+
+    const password =
+      typeof body.password === "string" ? body.password : "";
 
     if (!email || !password) {
-      return res.status(400).json({ message: 'Email and password are required' })
+      return res.status(400).json({
+        message: "Email and password are required",
+      });
     }
 
-    const user = await prisma.user.findUnique({ where: { email } })
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
 
     if (!user) {
-      return res.status(401).json({ message: 'Invalid email!' })
+      return res.status(401).json({
+        message: "Invalid email or password",
+      });
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password)
+    const isPasswordValid = await bcrypt.compare(
+      password,
+      user.password
+    );
+
     if (!isPasswordValid) {
-      return res.status(401).json({ message: 'Invalid password!' })
+      return res.status(401).json({
+        message: "Invalid email or password",
+      });
+    }
+
+    // Retrieve permissions assigned through the user's roles
+    const userRoles = await prisma.userRole.findMany({
+      where: { userId: user.id },
+      include: {
+        role: {
+          include: {
+            rolePermissions: {
+              include: {
+                permission: {
+                  select: { code: true },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const permissions = [
+      ...new Set(
+        userRoles.flatMap((userRole) =>
+          userRole.role.rolePermissions.map(
+            (rolePermission) =>
+              rolePermission.permission.code
+          )
+        )
+      ),
+    ];
+
+    const secret = process.env.JWT_SECRET;
+
+    if (!secret) {
+      console.error("JWT_SECRET is not configured");
+      return res.status(500).json({
+        message: "Server authentication configuration error",
+      });
     }
 
     const token = jwt.sign(
       {
         id: user.id,
-        mail: user.email
+        mail: user.email,
       },
-      process.env.JWT_SECRET || 'erp-secret',
-      { expiresIn: '1d' }
-    )
+      secret,
+      { expiresIn: "1d" }
+    );
 
     return res.json({
-      message: ' Login Successful!',
+      message: "Login successful",
       token,
-
       user: {
         id: user.id,
         email: user.email,
         name: user.name,
-        role: user.role
+        role: user.role,
+        permissions,
       },
-
-    })
-
+    });
   } catch (error) {
-    return res.status(500).json({ message: 'Login failed' })
+    console.error("Login error:", error);
+
+    return res.status(500).json({
+      message: "Login failed",
+    });
   }
-}
+};

@@ -19,6 +19,7 @@ import subLedgerImportRoutes from './routes/admin/utilities/subledger.route.js'
 import eInvoiceRoutes from './routes/admin/utilities/eInvoice.routes.js'
 import eWayBillRoutes from './routes/admin/utilities/eWayBill.routes.js'
 import gstStateRoutes from "./routes/admin/organization/gstState.routes.js";
+import userLogsRoutes from "./routes/userLogs.routes.js";
 //import securityRoutes from "./routes/admin/securities/security.routes.js";
 const app = express();
 
@@ -32,6 +33,7 @@ app.get("/", (req, res) => {
 });
 
 app.use('/api/auth',authRoutes) 
+app.use('/api/admin/user-logs', userLogsRoutes)
 app.use("/api/organization", organizationRoutes);
 app.use("/api/organizationUnit", organizationUnit);
 app.use('/api/organization/businessLocation', businessLocation);
