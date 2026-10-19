@@ -7,20 +7,26 @@ export type ProductStatus = StatusType // Active | Inactive | ...
 export type Product = {
   id: string
   productCode: string // e.g. ELE-SAM-A54
+  prdCode?: string // e.g. PRD-001
   productName: string
   department: string
   section: string
   category: string
   subCategory: string
+  group?: string
   brand: string
   uom: string
   hsnSac: string
   costPrice: number
   mrp: number
   sellingPrice: number
+  cost?: string | number
+  rsp?: string | number
+  stock?: number
   status: ProductStatus
   imageCount: number
   lastModified: string
+  modified?: string
   modifiedBy: string
 }
 

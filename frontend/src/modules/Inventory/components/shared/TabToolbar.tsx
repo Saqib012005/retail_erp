@@ -6,30 +6,34 @@ type TabToolbarProps = {
   count?: number | string
   searchPlaceholder?: string
   onSearch?: (q: string) => void
+  filters?: React.ReactNode
   actions?: React.ReactNode
 }
 
 /**
  * Per-tab header row used by Product Setup tabs:
- * "Products  8 records   [Search...] [Filters]  [actions...]"
+ * "Products / 15 records   [Search...] [Filters]  [actions...]"
  */
 export default function TabToolbar({
   title,
   count,
   searchPlaceholder = 'Search...',
   onSearch,
+  filters,
   actions,
 }: TabToolbarProps) {
   const [q, setQ] = useState('')
 
   return (
-    <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+    <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex flex-wrap items-center gap-3">
-        <h2 className="text-lg font-semibold text-[#043793]">{title}</h2>
-        {count !== undefined && (
-          <span className="text-sm text-slate-400">{count} records</span>
-        )}
-        <div className="relative ml-2 hidden sm:block">
+        <div className="flex flex-col">
+          <h2 className="text-base sm:text-lg font-bold text-slate-900 leading-tight">{title}</h2>
+          {count !== undefined && (
+            <span className="text-xs text-slate-400">{count} records</span>
+          )}
+        </div>
+        <div className="relative">
           <Search size={14} className="absolute top-1/2 left-3 -translate-y-1/2 text-slate-400" />
           <input
             value={q}
@@ -38,9 +42,10 @@ export default function TabToolbar({
               onSearch?.(e.target.value)
             }}
             placeholder={searchPlaceholder}
-            className="h-9 w-56 rounded-lg border border-slate-200 bg-white pl-8 pr-3 text-sm text-[#314158] placeholder:text-slate-400 focus:border-[#155DFC] focus:outline-none focus:ring-2 focus:ring-[#155DFC]/20"
+            className="h-8 w-44 sm:w-52 rounded-lg border border-slate-200 bg-white pl-8 pr-3 text-xs text-slate-700 placeholder:text-slate-400 focus:border-[#155DFC] focus:outline-none focus:ring-1 focus:ring-[#155DFC]"
           />
         </div>
+        {filters}
       </div>
       {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
     </div>
@@ -61,10 +66,10 @@ export function GhostButton({
     <button
       type="button"
       onClick={onClick}
-      className="flex h-9 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-sm font-medium text-[#314158] transition hover:bg-slate-50"
+      className="flex h-8 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 sm:px-3 text-xs font-medium text-slate-700 shadow-2xs transition hover:bg-slate-50"
     >
       {icon}
-      {label}
+      <span>{label}</span>
     </button>
   )
 }
@@ -83,10 +88,10 @@ export function PrimaryButton({
     <button
       type="button"
       onClick={onClick}
-      className="flex h-9 items-center gap-2 rounded-lg bg-[#155DFC] px-3.5 text-sm font-medium text-white transition hover:bg-[#1447E6]"
+      className="flex h-8 items-center gap-1.5 rounded-lg bg-[#155DFC] px-3 sm:px-3.5 text-xs font-medium text-white shadow-xs transition hover:bg-[#1048c7]"
     >
       {icon}
-      {label}
+      <span>{label}</span>
     </button>
   )
 }

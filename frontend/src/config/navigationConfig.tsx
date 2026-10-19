@@ -6,11 +6,17 @@ import {
   ShieldCheck,
   Settings,
   Boxes,
+  Package,
+  Warehouse,
+  Layers,
+  ArrowLeftRight,
+  BarChart2,
 } from "lucide-react";
 
 export interface Tab {
   label: string;
   path: string;
+  icon?: LucideIcon;
 }
 
 export interface ModuleRoute {
@@ -85,13 +91,13 @@ export const MODULE_ROUTES: ModuleRoute[] = [
     icon: Boxes,
     basePath: "/inventory",
     tabs: [
-      { label: "Inventory Dashboard", path: "dashboard" },
-      { label: "Product Setup", path: "product-setup" },
-      { label: "Warehouse Management", path: "warehouse-management" },
-      { label: "Inventory Management", path: "inventory-management" },
-      { label: "Inventory Operations", path: "inventory-operations" },
-      { label: "Reports", path: "reports" },
-      { label: "Configuration", path: "configuration" },
+      { label: "Inventory Dashboard", path: "dashboard", icon: LayoutDashboard },
+      { label: "Product Setup", path: "product-setup", icon: Package },
+      { label: "Warehouse Management", path: "warehouse-management", icon: Warehouse },
+      { label: "Inventory Management", path: "inventory-management", icon: Layers },
+      { label: "Inventory Operations", path: "inventory-operations", icon: ArrowLeftRight },
+      { label: "Reports", path: "reports", icon: BarChart2 },
+      { label: "Configuration", path: "configuration", icon: Settings },
     ],
   },
 ];
