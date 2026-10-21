@@ -15,8 +15,8 @@ import KittingTab from '../components/kitting/KittingTab'
 export default function ProductSetup() {
   return (
     <div className="page-shell">
-      {/* In-page 11-tab toolbar */}
-      <div className="flex items-center gap-1 sm:gap-1.5 overflow-x-auto border-b border-slate-200 bg-white px-1 sm:px-2 scrollbar-none">
+      {/* In-page 9-tab toolbar */}
+      <div className="flex items-center gap-5 sm:gap-6 overflow-x-auto border-b border-slate-200 bg-white px-4 sm:px-6 scrollbar-none">
         {PRODUCT_SETUP_TABS.map((tab) => {
           const Icon = tab.icon;
           return (
@@ -24,14 +24,14 @@ export default function ProductSetup() {
               key={tab.key}
               to={`/inventory/product-setup/${tab.key}`}
               className={({ isActive }) =>
-                `flex items-center gap-1.5 shrink-0 whitespace-nowrap border-b-2 px-3 py-2.5 text-xs sm:text-[13px] font-medium transition-colors ${
+                `flex items-center gap-2 shrink-0 whitespace-nowrap border-b-2 py-3 px-1 text-xs sm:text-[13px] font-medium transition-colors ${
                   isActive
-                    ? 'border-[#155DFC] text-[#155DFC]'
-                    : 'border-transparent text-slate-500 hover:text-slate-800'
+                    ? 'border-[#155DFC] text-[#155DFC] font-semibold -mb-[1px]'
+                    : 'border-transparent text-slate-600 hover:text-slate-900'
                 }`
               }
             >
-              <Icon size={14} className="shrink-0" />
+              <Icon size={15} className="shrink-0" />
               <span>{tab.label}</span>
             </NavLink>
           );

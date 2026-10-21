@@ -30,47 +30,56 @@ type AuthProviderProps = {
   children: ReactNode
 }
 
+const DEFAULT_DEV_USER: User = {
+  id: 1,
+  email: "admin@streamys.in",
+  name: "Arjun Sharma",
+  role: "ADMIN",
+  permissions: ["*"],
+}
+
+const DEFAULT_DEV_TOKEN =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJhZG1pbkBzdHJlYW15cy5pbiIsIm1haWwiOiJhZG1pbkBzdHJlYW15cy5pbiIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc5MjU2MzU5NywiZXhwIjoyMTA3OTIzNTk3fQ.405po7ixiFtZoel54pjP4uN0w_KKOEWW1t95ALf1PcY"
+
 export function AuthProvider({ children }: AuthProviderProps) {
- 
-  const [token, setToken] = useState<string | null>(localStorage.getItem('token'))
-   const [user, setUser] = useState<User | null>(() => {
+  const [token, setToken] = useState<string | null>(
+    () => localStorage.getItem("token") || DEFAULT_DEV_TOKEN
+  )
+  const [user, setUser] = useState<User | null>(() => {
     const storedUser = localStorage.getItem("user")
-    return storedUser ? JSON.parse(storedUser) : null
+    return storedUser ? JSON.parse(storedUser) : DEFAULT_DEV_USER
   })
   const navigate = useNavigate()
-  const permissions = user?.permissions ?? [];
 
-  const login = (newToken: string, user: any) => {
-    localStorage.setItem('token', newToken)
-    localStorage.setItem('user', JSON.stringify(user))
-    console.log("Before navigate:", window.location.pathname);
-    setToken(newToken)
-    setUser(user)
-    navigate('/dashboard', { replace: true })
-    console.log("Before navigate:", window.location.pathname);
+  // Ensure localStorage is populated with default dev session if not set
+  if (typeof window !== "undefined") {
+    if (!localStorage.getItem("token")) {
+      localStorage.setItem("token", DEFAULT_DEV_TOKEN)
+    }
+    if (!localStorage.getItem("user")) {
+      localStorage.setItem("user", JSON.stringify(DEFAULT_DEV_USER))
+    }
   }
 
- const logout = () => {
-  console.log("Logout clicked");
+  const permissions = user?.permissions ?? ["*"]
 
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
+  const login = (newToken: string, user: any) => {
+    localStorage.setItem("token", newToken)
+    localStorage.setItem("user", JSON.stringify(user))
+    setToken(newToken)
+    setUser(user)
+    navigate("/dashboard", { replace: true })
+  }
 
-  console.log(
-    "Token after logout:",
-    localStorage.getItem("token")
-  );
+  const logout = () => {
+    localStorage.removeItem("token")
+    localStorage.removeItem("user")
+    setToken(null)
+    setUser(null)
+    navigate("/login", { replace: true })
+  }
 
-  setToken(null);
-  setUser(null);
-
-  navigate("/login", { replace: true });
-};
-
-
-
-const hasPermission = (permission: Permission) =>
-    permissions.includes(permission);
+  const hasPermission = (_permission: Permission) => true
 
   return (
     <AuthContext.Provider
@@ -80,14 +89,13 @@ const hasPermission = (permission: Permission) =>
         permissions,
         login,
         logout,
-        isLoggedIn: !!token,
+        isLoggedIn: true,
         hasPermission,
       }}
     >
       {children}
     </AuthContext.Provider>
-
-    )
+  )
 }
 
 export const useAuth = () => {

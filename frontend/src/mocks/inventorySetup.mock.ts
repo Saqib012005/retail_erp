@@ -73,7 +73,7 @@ export const MOCK_PRODUCTS: Product[] = [
     lastModified: '2025-01-08', modified: '2025-01-08', modifiedBy: 'Priya Nair',
   },
   {
-    id: '9', productCode: 'HRD-SYS-FAN48', prdCode: 'PRD-009', productName: 'Syska 48-Inch Ceiling Fan',
+    id: '9', productCode: 'HRD-SYL-FAN48', prdCode: 'PRD-009', productName: 'Syska 48-Inch Ceiling Fan',
     department: 'Hardware', section: 'Electricals', category: 'Fans', subCategory: 'Ceiling',
     group: 'Hardware', brand: 'Syska', uom: 'PCS', hsnSac: '8414',
     costPrice: 1400, mrp: 38500, sellingPrice: 2200, stock: 0, status: 'Active', imageCount: 1,

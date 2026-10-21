@@ -13,7 +13,7 @@ function formatCompactINR(val: number | string | undefined): string {
   const num = typeof val === 'string' ? parseFloat(val) : val
   if (isNaN(num)) return String(val)
   if (num >= 1000) {
-    const k = (num / 1000).toFixed(1).replace(/\.0$/, '')
+    const k = (num / 1000).toFixed(1)
     return `₹${k}K`
   }
   return `₹${num.toLocaleString('en-IN')}`
