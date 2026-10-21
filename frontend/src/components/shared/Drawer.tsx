@@ -20,7 +20,7 @@ const sizeMap = {
   md: 'w-[500px]',
   lg: 'w-[600px]',
   xl: 'w-[750px]',
-  productDetail: 'w-full sm:w-[500px] md:w-[48vw] lg:w-[44vw] max-w-[580px] min-w-[340px]',
+  productDetail: 'w-full sm:w-[540px] md:w-[50vw] lg:w-[46vw] xl:w-[44vw] max-w-[660px] min-w-[360px]',
 }
 
 export default function Drawer({

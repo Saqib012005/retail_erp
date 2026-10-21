@@ -4,7 +4,7 @@ import { Plus, SlidersHorizontal, ArrowUpRight, ArrowDownLeft } from 'lucide-rea
 import ReusableTable from '@/components/shared/ReusableTable'
 import type { Product } from '@/types/inventorySetup'
 import { inventorySetupService } from '@/services/inventorySetupService'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import TabToolbar, { GhostButton, PrimaryButton } from '../shared/TabToolbar'
 import CreateProductDrawer from './CreateProductDrawer'
 
@@ -31,6 +31,7 @@ function renderStock(stock: number | undefined) {
 }
 
 export default function ProductsTab() {
+  const queryClient = useQueryClient()
   const { data: products = [], isLoading } = useQuery({
     queryKey: ['inventory-setup-products'],
     queryFn: inventorySetupService.getProducts,
@@ -39,6 +40,13 @@ export default function ProductsTab() {
   const [selected, setSelected] = useState<Product | null>(null)
   const [search, setSearch] = useState('')
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
+
+  const handleProductCreated = (newProd: Partial<Product>) => {
+    queryClient.setQueryData<Product[]>(['inventory-setup-products'], (old = []) => [
+      newProd as Product,
+      ...old,
+    ])
+  }
 
   const filtered = useMemo(
     () =>
@@ -80,10 +88,12 @@ export default function ProductsTab() {
       ),
     },
     {
-      title: 'Group',
-      dataIndex: 'group',
+      title: 'Category',
+      dataIndex: 'category',
       width: 110,
-      render: (_: any, r: Product) => <span className="text-xs text-slate-600">{r.group || r.department}</span>,
+      render: (_: any, r: Product) => (
+        <span className="text-xs text-slate-600">{r.department || r.category || r.group}</span>
+      ),
     },
     {
       title: 'Brand',
@@ -194,6 +204,7 @@ export default function ProductsTab() {
           setSelected(null)
         }}
         product={selected}
+        onProductCreated={handleProductCreated}
       />
     </div>
   )
