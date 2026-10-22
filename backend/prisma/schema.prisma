@@ -31,19 +31,11 @@ model User {
 
   createdAccountingYears AccountingYear[] @relation("CreatedAccountingYears")
   updatedAccountingYears AccountingYear[] @relation("UpdatedAccountingYears")
-<<<<<<< HEAD
-
-  createdGSTINs GSTIN[] @relation("UserCreatedGSTINs")
-
-  createdGstStates GstState[] @relation("GstStateCreatedBy")
-  updatedGstStates GstState[] @relation("GstStateUpdatedBy")
-=======
   createdGSTINs          GSTIN[]          @relation("UserCreatedGSTINs")
   createdGstStates       GstState[]       @relation("GstStateCreatedBy")
   updatedGstStates       GstState[]       @relation("GstStateUpdatedBy")
   performedFinanceMonthAudits FinanceMonthAudit[] @relation("PerformedFinanceMonthAudits")
 
->>>>>>> pr-54
 
   @@schema("user")
 }
