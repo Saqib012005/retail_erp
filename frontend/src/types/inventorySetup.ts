@@ -58,6 +58,9 @@ export type Brand = {
   description: string
   productCount: number
   status: ProductStatus
+  country?: string
+  websiteUrl?: string
+  logoUrl?: string
   // Optional brand card customization (per design: colored monogram tile)
   color?: string // tailwind bg class e.g. bg-[#EFF6FF]
   textColor?: string
@@ -257,5 +260,6 @@ export type Bundle = {
   type: BundleType
   components: BundleComponent[]
   totalCost: number
+  sellPrice?: number
   status: ProductStatus
 }

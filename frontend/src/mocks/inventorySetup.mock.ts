@@ -272,13 +272,13 @@ export const MOCK_VENDOR_MAPPINGS: VendorMapping[] = [
 /* ---------------- Tax ---------------- */
 
 export const MOCK_TAX_CONFIGS: TaxConfig[] = [
-  { id: '1', taxId: 'TAX-001', productCode: 'ELE-SAM-A54', productName: 'Samsung Galaxy A54 5G', hsnSac: '8471', taxGroup: 'Electronics 18%', cgst: 9, sgst: 9, igst: 18, cess: 0, effectiveDate: '01 Apr 2026', isDefault: false },
-  { id: '2', taxId: 'TAX-002', productCode: 'APP-NIK-AM270', productName: 'Nike Air Max 270', hsnSac: '6404', taxGroup: 'Apparel 12%', cgst: 6, sgst: 6, igst: 12, cess: 0, effectiveDate: '01 Apr 2026', isDefault: false },
-  { id: '3', taxId: 'TAX-003', productCode: 'FMCG-DOV-BW500', productName: 'Dove Body Wash 500ml', hsnSac: '3401', taxGroup: 'FMCG 18%', cgst: 9, sgst: 9, igst: 18, cess: 0, effectiveDate: '01 Apr 2026', isDefault: false },
-  { id: '4', taxId: 'TAX-004', productCode: 'HRD-BSH-DR600', productName: 'Bosch Drill Machine 600W', hsnSac: '8467', taxGroup: 'Hardware 18%', cgst: 9, sgst: 9, igst: 18, cess: 0, effectiveDate: '01 Apr 2026', isDefault: false },
-  { id: '5', taxId: 'TAX-005', productCode: 'FMCG-ITC-AASH500', productName: 'Aashirvaad Atta 5Kg', hsnSac: '1101', taxGroup: 'Grocery 5%', cgst: 2.5, sgst: 2.5, igst: 5, cess: 0, effectiveDate: '01 Apr 2026', isDefault: true },
-  { id: '6', taxId: 'TAX-006', productCode: 'PHR-CIP-AZTH500', productName: 'Azithromycin 500mg Strip', hsnSac: '3004', taxGroup: 'Pharma 12%', cgst: 6, sgst: 6, igst: 12, cess: 0, effectiveDate: '01 Apr 2026', isDefault: false },
-  { id: '7', taxId: 'TAX-007', productCode: 'ELE-APL-IPH15', productName: 'Apple iPhone 15 128GB', hsnSac: '8517', taxGroup: 'Electronics 18%', cgst: 9, sgst: 9, igst: 18, cess: 0, effectiveDate: '01 Apr 2026', isDefault: false },
+  { id: '1', taxId: 'TAX-001', productCode: 'ELE-SAM-A54', productName: 'Samsung Galaxy A54 5G', hsnSac: '8517 12 90', taxGroup: 'Standard', cgst: 18, sgst: 18, igst: 18, cess: 0, effectiveDate: '01 Apr 2026', isDefault: false },
+  { id: '2', taxId: 'TAX-002', productCode: 'APP-NIK-AM270', productName: 'Nike Air Max 270', hsnSac: '6402 99 00', taxGroup: 'Standard', cgst: 18, sgst: 18, igst: 18, cess: 0, effectiveDate: '01 Apr 2026', isDefault: false },
+  { id: '3', taxId: 'TAX-003', productCode: 'FMCG-DOV-BW500', productName: 'Dove Body Wash 500ml', hsnSac: '3305 90 00', taxGroup: 'Standard', cgst: 18, sgst: 18, igst: 18, cess: 0, effectiveDate: '01 Apr 2026', isDefault: false },
+  { id: '4', taxId: 'TAX-004', productCode: 'HRD-BSH-DR600', productName: 'Bosch Drill Machine 600W', hsnSac: '8467 11 00', taxGroup: 'Standard', cgst: 18, sgst: 18, igst: 18, cess: 0, effectiveDate: '01 Apr 2026', isDefault: false },
+  { id: '5', taxId: 'TAX-005', productCode: 'FMCG-ITC-AASH500', productName: 'Aashirvaad Atta 5Kg', hsnSac: '1101 00 20', taxGroup: 'Essential', cgst: 5, sgst: 5, igst: 5, cess: 0, effectiveDate: '01 Apr 2026', isDefault: true },
+  { id: '6', taxId: 'TAX-006', productCode: 'PHR-CIP-AZTH500', productName: 'Azithromycin 500mg Strip', hsnSac: '3004 90 99', taxGroup: 'Pharma', cgst: 12, sgst: 12, igst: 12, cess: 0, effectiveDate: '01 Apr 2026', isDefault: false },
+  { id: '7', taxId: 'TAX-007', productCode: 'ELE-APL-IPH15', productName: 'Apple iPhone 15 128GB', hsnSac: '8517 12 10', taxGroup: 'Standard', cgst: 18, sgst: 18, igst: 18, cess: 0, effectiveDate: '01 Apr 2026', isDefault: false },
 ]
 
 /* ---------------- Barcode ---------------- */
@@ -322,25 +322,25 @@ export const DATA_VERIFICATION_MOCK = {
 
 export const MOCK_INVENTORY_CONFIG: InventoryConfigCard[] = [
   {
-    id: 'card-general',
-    title: 'General Settings',
-    description: 'Core inventory behaviour for this organization',
+    id: 'tracking-policies',
+    title: 'Tracking Policies',
+    description: 'Configure batch, serial, and stock movement rules',
     items: [
-      { id: 'cfg-1', label: 'Enable Batch Tracking', description: 'Track inventory by batch numbers for expiry-sensitive goods', enabled: true },
-      { id: 'cfg-2', label: 'Enable Serial Number Tracking', description: 'Assign unique serials to serialized items', enabled: false },
-      { id: 'cfg-3', label: 'Allow Negative Stock', description: 'Permit sales when stock falls below zero', enabled: false },
-      { id: 'cfg-4', label: 'Enable Multi-Warehouse Transfers', description: 'Move stock between warehouses with audit trail', enabled: true },
+      { id: 'cfg-1', label: 'Batch Tracking', description: 'Track inventory by batch numbers (lot tracking)', enabled: true },
+      { id: 'cfg-2', label: 'Serial Number Tracking', description: 'Track each unit by unique serial number', enabled: false },
+      { id: 'cfg-3', label: 'Expiry Date Tracking', description: 'Track product expiry dates for batch items', enabled: true },
+      { id: 'cfg-4', label: 'Allow Negative Stock', description: 'Allow stock to go below zero (use with caution)', enabled: false },
     ],
   },
   {
-    id: 'card-valuation',
-    title: 'Valuation & Costing',
+    id: 'valuation-policy',
+    title: 'Valuation Policy',
     description: 'Costing method and stock valuation rules',
     items: [
-      { id: 'cfg-5', label: 'FIFO Costing Method', description: 'First-in-first-out cost layers for COGS', enabled: true },
-      { id: 'cfg-6', label: 'Landed Cost Allocation', description: 'Distribute freight & duty across inbound items', enabled: true },
-      { id: 'cfg-7', label: 'Auto COGS Recalculation', description: 'Recalculate COGS after inventory transactions', enabled: false },
-      { id: 'cfg-8', label: 'Reorder Level Alerts', description: 'Notify when stock hits reorder threshold', enabled: true },
+      { id: 'cfg-5', label: 'Cost Method FIFO', description: 'First In, First Out — oldest stock valued first', enabled: true },
+      { id: 'cfg-6', label: 'WAC Valuation', description: 'Weighted Average Calculation cost method', enabled: false },
+      { id: 'cfg-7', label: 'FIFO Valuation', description: 'First In, First Out — oldest stock valued first', enabled: true },
+      { id: 'cfg-8', label: 'Shelf life of 365 Days', description: '', enabled: true },
     ],
   },
 ]
@@ -351,43 +351,61 @@ export const MOCK_BUNDLES: Bundle[] = [
   {
     id: '1', bundleCode: 'BND-SMRT-001', bundleName: 'Samsung Smart Bundle', bundleProductCode: 'BND-0001', type: 'Bundle', status: 'Active',
     components: [
-      { id: 'c1', productName: 'Samsung Galaxy A54', productCode: 'SKU-1091', qty: 1, uom: 'Piece', cost: 28000 },
-      { id: 'c2', productName: 'Tempered Glass', productCode: 'SKU-2043', qty: 1, uom: 'Piece', cost: 199 },
-      { id: 'c3', productName: 'Silicone Case', productCode: 'SKU-2088', qty: 1, uom: 'Piece', cost: 349 },
+      { id: 'c1', productName: 'Samsung Galaxy A54', productCode: 'SKU-1091', qty: 1, uom: 'Piece', cost: 48000 },
+      { id: 'c2', productName: 'Tempered Glass', productCode: 'SKU-2043', qty: 1, uom: 'Piece', cost: 1200 },
+      { id: 'c3', productName: 'Silicone Case', productCode: 'SKU-2088', qty: 1, uom: 'Piece', cost: 2000 },
     ],
-    totalCost: 28548,
+    totalCost: 51200,
+    sellPrice: 63000,
   },
   {
     id: '2', bundleCode: 'BND-FTNS-001', bundleName: 'Fitness Starter Kit', bundleProductCode: 'BND-0002', type: 'Bundle', status: 'Active',
     components: [
-      { id: 'c1', productName: 'Yoga Mat 6mm', productCode: 'SKU-3010', qty: 1, uom: 'Piece', cost: 899 },
-      { id: 'c2', productName: 'Dumbbell Set 5Kg', productCode: 'SKU-3011', qty: 2, uom: 'Piece', cost: 1499 },
+      { id: 'c1', productName: 'Yoga Mat 6mm', productCode: 'SKU-3010', qty: 1, uom: 'Piece', cost: 1500 },
+      { id: 'c2', productName: 'Dumbbell Set 5Kg', productCode: 'SKU-3011', qty: 2, uom: 'Piece', cost: 2400 },
+      { id: 'c3', productName: 'Skipping Rope', productCode: 'SKU-3012', qty: 1, uom: 'Piece', cost: 400 },
+      { id: 'c4', productName: 'Water Bottle 1L', productCode: 'SKU-3013', qty: 1, uom: 'Piece', cost: 600 },
     ],
-    totalCost: 3897,
+    totalCost: 8900,
+    sellPrice: 12000,
   },
   {
     id: '3', bundleCode: 'KIT-CLNG-001', bundleName: 'Home Cleaning Kit', bundleProductCode: 'BND-0003', type: 'Kit', status: 'Active',
     components: [
-      { id: 'c1', productName: 'Surface Cleaner 1L', productCode: 'SKU-4010', qty: 2, uom: 'Bottle', cost: 199 },
-      { id: 'c2', productName: 'Microfiber Cloth', productCode: 'SKU-4011', qty: 3, uom: 'Piece', cost: 49 },
+      { id: 'c1', productName: 'Surface Cleaner 1L', productCode: 'SKU-4010', qty: 2, uom: 'Bottle', cost: 200 },
+      { id: 'c2', productName: 'Microfiber Cloth', productCode: 'SKU-4011', qty: 3, uom: 'Piece', cost: 150 },
+      { id: 'c3', productName: 'Glass Cleaner 500ml', productCode: 'SKU-4012', qty: 1, uom: 'Bottle', cost: 130 },
+      { id: 'c4', productName: 'Duster', productCode: 'SKU-4013', qty: 1, uom: 'Piece', cost: 100 },
+      { id: 'c5', productName: 'Scrub Pad', productCode: 'SKU-4014', qty: 2, uom: 'Piece', cost: 100 },
+      { id: 'c6', productName: 'Rubber Gloves', productCode: 'SKU-4015', qty: 1, uom: 'Pair', cost: 100 },
     ],
-    totalCost: 545,
+    totalCost: 780,
+    sellPrice: 1300,
   },
   {
     id: '4', bundleCode: 'BND-TOOL-001', bundleName: 'Power Tools Pro Bundle', bundleProductCode: 'BND-0004', type: 'Bundle', status: 'Active',
     components: [
-      { id: 'c1', productName: 'Bosch Drill 600W', productCode: 'SKU-5010', qty: 1, uom: 'Piece', cost: 3200 },
-      { id: 'c2', productName: 'Drill Bit Set', productCode: 'SKU-5011', qty: 1, uom: 'Box', cost: 599 },
+      { id: 'c1', productName: 'Bosch Drill 600W', productCode: 'SKU-5010', qty: 1, uom: 'Piece', cost: 10000 },
+      { id: 'c2', productName: 'Drill Bit Set', productCode: 'SKU-5011', qty: 1, uom: 'Box', cost: 2200 },
+      { id: 'c3', productName: 'Tool Box Organizer', productCode: 'SKU-5012', qty: 1, uom: 'Piece', cost: 2000 },
     ],
-    totalCost: 3799,
+    totalCost: 14200,
+    sellPrice: 20000,
   },
   {
     id: '5', bundleCode: 'KIT-PRSNL-001', bundleName: 'Personal Care Essentials', bundleProductCode: 'BND-0005', type: 'Kit', status: 'Active',
     components: [
-      { id: 'c1', productName: 'Dove Body Wash 500ml', productCode: 'SKU-6010', qty: 1, uom: 'Bottle', cost: 210 },
-      { id: 'c2', productName: 'Shampoo 340ml', productCode: 'SKU-6011', qty: 1, uom: 'Bottle', cost: 240 },
+      { id: 'c1', productName: 'Dove Body Wash 500ml', productCode: 'SKU-6010', qty: 1, uom: 'Bottle', cost: 250 },
+      { id: 'c2', productName: 'Shampoo 340ml', productCode: 'SKU-6011', qty: 1, uom: 'Bottle', cost: 250 },
+      { id: 'c3', productName: 'Conditioner 200ml', productCode: 'SKU-6012', qty: 1, uom: 'Bottle', cost: 200 },
+      { id: 'c4', productName: 'Body Lotion 250ml', productCode: 'SKU-6013', qty: 1, uom: 'Bottle', cost: 180 },
+      { id: 'c5', productName: 'Hand Wash 250ml', productCode: 'SKU-6014', qty: 1, uom: 'Bottle', cost: 90 },
+      { id: 'c6', productName: 'Face Wash 100ml', productCode: 'SKU-6015', qty: 1, uom: 'Tube', cost: 110 },
+      { id: 'c7', productName: 'Toothpaste 150g', productCode: 'SKU-6016', qty: 1, uom: 'Tube', cost: 70 },
+      { id: 'c8', productName: 'Toothbrush Twin Pack', productCode: 'SKU-6017', qty: 1, uom: 'Pack', cost: 50 },
     ],
-    totalCost: 450,
+    totalCost: 1200,
+    sellPrice: 2000,
   },
 ]
 

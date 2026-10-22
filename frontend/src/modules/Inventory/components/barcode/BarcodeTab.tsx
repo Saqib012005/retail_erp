@@ -19,6 +19,9 @@ import { DATA_VERIFICATION_MOCK } from '@/mocks/inventorySetup.mock'
 import TabToolbar, { GhostButton, PrimaryButton } from '../shared/TabToolbar'
 import ModulePill from '../shared/ModulePill'
 import { Modal } from '@/components/shared/Modal'
+import PrintBarcodesDrawer from './PrintBarcodesDrawer'
+import toast from 'react-hot-toast'
+import { exportToCSV } from '@/utils/exportData'
 import {
   FieldWrap,
   SelectInput,
@@ -457,8 +460,30 @@ export default function BarcodeTab() {
   })
 
   const [createOpen, setCreateOpen] = useState(false)
+  const [printOpen, setPrintOpen] = useState(false)
   const [bulkVerificationOpen, setBulkVerificationOpen] = useState(false)
   const [search, setSearch] = useState('')
+
+  const handleExport = () => {
+    exportToCSV(
+      barcodes,
+      [
+        { header: 'Barcode ID', accessor: (b) => b.barcodeId },
+        { header: 'Product Name', accessor: (b) => b.productName },
+        { header: 'Product Code', accessor: (b) => b.productCode },
+        { header: 'Barcode Value', accessor: (b) => b.value },
+        { header: 'Type', accessor: (b) => b.type },
+        { header: 'Batch', accessor: (b) => b.batch },
+        { header: 'Status', accessor: (b) => b.status },
+      ],
+      'barcodes-list.csv'
+    )
+    toast.success('Exported barcodes to CSV')
+  }
+
+  const handleImport = () => {
+    toast.success('Select a CSV or Excel file to import barcodes')
+  }
 
   const filtered = useMemo(
     () =>
@@ -532,9 +557,9 @@ export default function BarcodeTab() {
         actions={
           <>
             <GhostButton label="Filters" />
-            <GhostButton label="Print Labels" />
-            <GhostButton label="Export" />
-            <GhostButton label="Import" />
+            <GhostButton label="Print Labels" onClick={() => setPrintOpen(true)} />
+            <GhostButton label="Export" onClick={handleExport} />
+            <GhostButton label="Import" onClick={handleImport} />
             <PrimaryButton icon={<Plus size={14} />} label="Generate Barcode" onClick={() => setCreateOpen(true)} />
           </>
         }
@@ -559,16 +584,28 @@ export default function BarcodeTab() {
       </div>
 
       {/* Batch generate strip */}
-      <div className="mb-4 rounded-2xl border border-slate-200 bg-white p-4">
-        <div className="flex items-center gap-2">
-          <Sparkles size={14} className="text-[#155DFC]" />
-          <p className="text-sm font-semibold text-[#043793]">Batch Generate Barcodes</p>
+      <div className="mb-4 rounded-2xl border border-slate-200 bg-white p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <div className="flex items-center gap-2">
+            <Sparkles size={14} className="text-[#155DFC]" />
+            <p className="text-sm font-semibold text-[#043793]">Batch Generate Barcodes</p>
+          </div>
+          <p className="mt-1 text-xs text-slate-400">
+            {stats?.batchCount ?? 6} barcodes generated · Batch {stats?.lastBatch ?? 'BCH-2025-001'}
+          </p>
         </div>
-        <p className="mt-1 text-xs text-slate-400">
-          {stats?.batchCount ?? 6} barcodes generated · Batch {stats?.lastBatch ?? 'BCH-2025-001'}
-        </p>
-        <div className="mt-3 h-9 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs leading-9 text-slate-400">
-          Select Category / Filter
+        <div className="flex items-center gap-2">
+          <div className="h-9 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs leading-9 text-slate-400">
+            Select Category / Filter
+          </div>
+          <button
+            type="button"
+            onClick={() => setPrintOpen(true)}
+            className="flex h-9 items-center gap-1.5 px-3.5 text-xs font-semibold rounded-lg bg-[#EFF6FF] border border-blue-200 text-[#155DFC] hover:bg-blue-100 transition cursor-pointer"
+          >
+            <ScanBarcode size={13} />
+            <span>Print Barcodes</span>
+          </button>
         </div>
       </div>
 
@@ -582,6 +619,12 @@ export default function BarcodeTab() {
         }}
         bulkVerificationOpen={bulkVerificationOpen}
         setBulkVerificationOpen={setBulkVerificationOpen}
+      />
+
+      <PrintBarcodesDrawer
+        isOpen={printOpen}
+        onClose={() => setPrintOpen(false)}
+        totalCount={stats?.total ?? 250}
       />
     </div>
   )
