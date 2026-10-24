@@ -1,5 +1,4 @@
 import { Routes, Route, Navigate } from "react-router-dom"
-import { useAuth } from "../context/AuthContext"
 import DashBoardLayout from "../layouts/DashBoardLayout"
 import LoginForm from "../modules/auth/pages/LoginForm"
 import DashBoard from "../modules/dashboard/pages/DashBoard"
@@ -34,20 +33,16 @@ import ProductSetup from '../modules/Inventory/pages/ProductSetup'
 import ModulePlaceholder from '../modules/Inventory/pages/ModulePlaceholder'
 
 export default function AppRoutes() {
-  const { isLoggedIn } = useAuth()
-  
   return (
   <Routes>
     <Route
       path="/login"
-      element={isLoggedIn ? <Navigate to="/dashboard" replace /> : <LoginForm />}
+      element={<LoginForm />}
     />
 
-    {/* Protected Layout */}
+    {/* App Layout */}
     <Route
-      element={
-        isLoggedIn ? <DashBoardLayout /> : <Navigate to="/login" replace />
-      }
+      element={<DashBoardLayout />}
     >
       <Route path="/dashboard" element={<DashBoard />} />
 
@@ -99,11 +94,11 @@ export default function AppRoutes() {
     {/* Default Route */}
     <Route
       path="/"
-      element={<Navigate to={isLoggedIn ? "/dashboard" : "/login"} replace />}
+      element={<Navigate to="/dashboard" replace />}
     />
     <Route
       path="*"
-      element={<Navigate to={isLoggedIn ? "/dashboard" : "/login"} replace />}
+      element={<Navigate to="/dashboard" replace />}
     />
   </Routes>
 );

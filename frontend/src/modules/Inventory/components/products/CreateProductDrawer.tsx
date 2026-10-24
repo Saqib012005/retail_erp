@@ -1,11 +1,12 @@
-import { useState } from 'react'
-import { Check, ImagePlus, Printer, SquarePen, X } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Activity, AlertTriangle, Check, ImagePlus, Printer, SquarePen, X } from 'lucide-react'
+import toast from 'react-hot-toast'
 import Drawer from '@/components/shared/Drawer'
 import { FieldWrap, SelectInput, TextInput } from '../shared/formControls'
 import SectionLabel from '../shared/SectionLabel'
 import type { Product } from '@/types/inventorySetup'
 
-/* ---------------- Tabs (design order) ---------------- */
+/* ---------------- Tabs (exact design order) ---------------- */
 
 const DRAWER_TABS = [
   { key: 'general', label: 'General' },
@@ -18,11 +19,17 @@ const DRAWER_TABS = [
 ] as const
 
 type DrawerTabKey = (typeof DRAWER_TABS)[number]['key']
+const ALL_TABS: DrawerTabKey[] = [
+  'general',
+  'inventory',
+  'pricing',
+  'tax',
+  'images',
+  'history',
+  'timeline',
+]
 
-const FORM_TABS: DrawerTabKey[] = ['general', 'inventory', 'pricing', 'tax', 'images']
-const VIEW_TABS: DrawerTabKey[] = ['general', 'inventory', 'pricing', 'tax', 'images', 'history', 'timeline']
-
-/* ---------------- Shared bits ---------------- */
+/* ---------------- Horizontal Tab Navigation Bar ---------------- */
 
 function DrawerTabBar({
   active,
@@ -34,21 +41,25 @@ function DrawerTabBar({
   tabs: readonly DrawerTabKey[]
 }) {
   return (
-    <div className="flex gap-6 border-b border-slate-100 px-7">
+    <div className="flex items-center gap-6 sm:gap-7 border-b border-slate-200 bg-white px-6 overflow-x-auto scrollbar-none">
       {tabs.map((key) => {
         const label = DRAWER_TABS.find((t) => t.key === key)?.label ?? key
+        const isActive = active === key
         return (
           <button
             key={key}
             type="button"
             onClick={() => onChange(key)}
-            className={`-mb-px border-b-2 py-3.5 text-sm font-medium transition ${
-              active === key
-                ? 'border-[#155DFC] text-[#155DFC]'
-                : 'border-transparent text-[#6B7A99] hover:text-[#155DFC]'
+            className={`relative py-3 text-[12px] sm:text-[12.5px] font-medium whitespace-nowrap transition-colors cursor-pointer ${
+              isActive
+                ? 'text-[#2563EB] font-semibold'
+                : 'text-slate-500 hover:text-[#2563EB]'
             }`}
           >
             {label}
+            {isActive && (
+              <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#2563EB] rounded-full" />
+            )}
           </button>
         )
       })}
@@ -56,111 +67,199 @@ function DrawerTabBar({
   )
 }
 
-/** Two-column grid used by every form tab in the design. */
+/** Two-column grid used by form tabs */
 function FieldGrid({ children }: { children: React.ReactNode }) {
-  return <div className="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">{children}</div>
+  return <div className="grid grid-cols-1 gap-x-5 gap-y-3.5 sm:grid-cols-2">{children}</div>
 }
 
-/* ---------------- General tab (design: Create New Product / General) ---------------- */
+/* ---------------- Dropdown Option Lists ---------------- */
 
-const GROUP_OPTIONS = ['Group A', 'Group B', 'Group C']
-const DEPARTMENT_OPTIONS = ['Electronics', 'Apparel', 'FMCG', 'Pharma', 'Hardware']
-const SECTION_OPTIONS = ['Mobiles', 'Audio', 'Footwear', 'Grocery', 'Tools']
-const UOM_OPTIONS = ['PCS', 'BTL', 'TUB', 'PKT', 'KGS']
+const GROUP_OPTIONS = ['Electronics', 'Apparel', 'FMCG', 'Hardware', 'Pharma']
+const DEPARTMENT_OPTIONS = ['Electronics', 'Apparel', 'FMCG', 'Hardware', 'Pharma']
+const SECTION_OPTIONS = ['Mobiles', 'Audio', 'Footwear', 'Power Tools', 'Clothing', 'Personal Care', 'Electricals']
+const BRAND_OPTIONS = ['Samsung', 'Nike', 'Dove', 'Bosch', 'Levis', 'Voltaren', 'Apple', 'HUL', 'Syska', 'Sony', 'ITC', 'Cipla']
+const UOM_OPTIONS = ['PCS', 'BTL', 'TUB', 'PKT', 'KGS', 'STR']
+const PRODUCT_TYPE_OPTIONS = ['Finished Good', 'Raw Material', 'Service']
 const VENDOR_OPTIONS = [
   'Samsung India Pvt Ltd',
   'Redington India',
   'Distributor Hub Mumbai',
   'Nike Sports India',
+  'HUL Distribution Ltd',
 ]
-const STATUS_OPTIONS = ['Active', 'Draft', 'Inactive']
 
-function GeneralSection() {
+/* ---------------- Form State Type ---------------- */
+
+export type ProductFormData = {
+  productCode: string
+  oemCode: string
+  productName: string
+  group: string
+  department: string
+  section: string
+  brand: string
+  uom: string
+  productType: string
+  vendor: string
+  attr1: string
+  attr2: string
+  status: string
+}
+
+/* ---------------- General Tab (Figma Screenshot 2) ---------------- */
+
+function GeneralSection({
+  formData,
+  setFormData,
+}: {
+  formData: ProductFormData
+  setFormData: React.Dispatch<React.SetStateAction<ProductFormData>>
+}) {
+  const updateField = (key: keyof ProductFormData, val: string) => {
+    setFormData((prev) => ({ ...prev, [key]: val }))
+  }
+
   return (
-    <div className="space-y-5">
-      {/* Warning banner (design: amber info box at top of General) */}
-      <div className="flex items-start gap-2.5 rounded-lg border border-[#FDB515]/50 bg-[#FFFBEB] px-4 py-3">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="mt-0.5 shrink-0 text-[#B45309]">
-          <path
-            d="M12 9v4m0 4h.01M10.299 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.7 3.86a2 2 0 0 0-3.4 0Z"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-        <p className="text-[13px] leading-relaxed text-[#92400E]">
+    <div className="space-y-4">
+      {/* Warning Banner */}
+      <div className="flex items-start gap-2.5 rounded-lg border border-[#FDE68A] bg-[#FFFBEB] px-3.5 py-2.5">
+        <AlertTriangle size={16} className="mt-0.5 shrink-0 text-[#D97706]" />
+        <p className="text-[11.5px] leading-relaxed text-[#92400E]">
           Product Code is auto-generated and cannot be changed after creation. Ensure all mandatory
           fields are filled before saving.
         </p>
       </div>
 
       <FieldGrid>
+        {/* Row 1 */}
         <div>
           <FieldWrap label="Product Code" required>
-            <TextInput placeholder="Will be auto-generated" disabled />
+            <TextInput
+              placeholder="Will be auto-generated"
+              value={formData.productCode}
+              disabled
+            />
           </FieldWrap>
-          <p className="mt-1 text-xs text-[#6B7A99]">Auto-generated on save</p>
+          <p className="mt-1 text-[11px] text-slate-400">Auto-generated on save</p>
         </div>
+
         <FieldWrap label="OEM Code" required>
-          <TextInput placeholder="" />
+          <TextInput
+            placeholder="e.g. PRD-001"
+            value={formData.oemCode}
+            onChange={(v) => updateField('oemCode', v)}
+          />
         </FieldWrap>
+
+        {/* Row 2 */}
         <FieldWrap label="Product Name" required>
-          <TextInput placeholder="e.g. Samsung Galaxy A54 5G" />
+          <TextInput
+            placeholder="e.g. Samsung Galaxy A54 5G"
+            value={formData.productName}
+            onChange={(v) => updateField('productName', v)}
+          />
         </FieldWrap>
+
         <FieldWrap label="Group" required>
-          <SelectInput options={GROUP_OPTIONS} placeholder="Select dropdown" />
+          <SelectInput
+            options={GROUP_OPTIONS}
+            value={formData.group}
+            placeholder="Select dropdown"
+            onChange={(v) => updateField('group', v)}
+          />
         </FieldWrap>
-        {/* Design label spells "Dpartement" */}
-        <FieldWrap label="Dpartement" required>
-          <SelectInput options={DEPARTMENT_OPTIONS} placeholder="Select dropdown" />
+
+        {/* Row 3 */}
+        <FieldWrap label="Department" required>
+          <SelectInput
+            options={DEPARTMENT_OPTIONS}
+            value={formData.department}
+            placeholder="Select dropdown"
+            onChange={(v) => updateField('department', v)}
+          />
         </FieldWrap>
+
         <FieldWrap label="Section">
-          <SelectInput options={SECTION_OPTIONS} placeholder="Select dropdown" />
+          <SelectInput
+            options={SECTION_OPTIONS}
+            value={formData.section}
+            placeholder="Select dropdown"
+            onChange={(v) => updateField('section', v)}
+          />
         </FieldWrap>
+
+        {/* Row 4 */}
         <FieldWrap label="Brand">
-          <SelectInput options={['Samsung', 'Nike', 'Dove', 'Bosch', 'Levis']} placeholder="Select dropdown" />
+          <SelectInput
+            options={BRAND_OPTIONS}
+            value={formData.brand}
+            placeholder="Select dropdown"
+            onChange={(v) => updateField('brand', v)}
+          />
         </FieldWrap>
+
         <FieldWrap label="UOM" required>
-          <SelectInput options={UOM_OPTIONS} placeholder="Select dropdown" />
+          <SelectInput
+            options={UOM_OPTIONS}
+            value={formData.uom}
+            placeholder="Select dropdown"
+            onChange={(v) => updateField('uom', v)}
+          />
         </FieldWrap>
+
+        {/* Row 5 */}
         <FieldWrap label="Product Type" required>
-          <SelectInput options={['Finished Good', 'Raw Material', 'Service']} placeholder="Select dropdown" />
+          <SelectInput
+            options={PRODUCT_TYPE_OPTIONS}
+            value={formData.productType}
+            placeholder="Select dropdown"
+            onChange={(v) => updateField('productType', v)}
+          />
         </FieldWrap>
+
         <FieldWrap label="Select Vendor" required>
-          <SelectInput options={VENDOR_OPTIONS} placeholder="Select dropdown" />
+          <SelectInput
+            options={VENDOR_OPTIONS}
+            value={formData.vendor}
+            placeholder="Select dropdown"
+            onChange={(v) => updateField('vendor', v)}
+          />
         </FieldWrap>
+
+        {/* Row 6 */}
         <FieldWrap label="Attribute 1" required>
-          <SelectInput options={['Color', 'Size', 'Material']} placeholder="Select dropdown" />
+          <SelectInput
+            options={['Color', 'Size', 'Material', 'Warranty']}
+            value={formData.attr1}
+            placeholder="Select dropdown"
+            onChange={(v) => updateField('attr1', v)}
+          />
         </FieldWrap>
+
         <FieldWrap label="Attribute 2" required>
-          <SelectInput options={['Size', 'Storage', 'Fit']} placeholder="Select dropdown" />
-        </FieldWrap>
-        <FieldWrap label="Attribute 3" required>
-          <SelectInput options={['Material', 'Fabric', 'Capacity']} placeholder="Select dropdown" />
-        </FieldWrap>
-        <FieldWrap label="Attribute 4" required>
-          <SelectInput options={['Brand', 'Pattern', 'Warranty']} placeholder="Select dropdown" />
-        </FieldWrap>
-        <FieldWrap label="Status" required>
-          <SelectInput options={STATUS_OPTIONS} placeholder="Select dropdown" />
+          <SelectInput
+            options={['Storage', 'Size', 'Fit', 'Capacity', 'RAM']}
+            value={formData.attr2}
+            placeholder="Select dropdown"
+            onChange={(v) => updateField('attr2', v)}
+          />
         </FieldWrap>
       </FieldGrid>
     </div>
   )
 }
 
-/* ---------------- Inventory tab (design: Inventory Rules + Tracking Configuration) ---------------- */
+/* ---------------- Inventory Tab ---------------- */
 
-function InventorySection() {
+function InventorySection({ product: _product }: { product?: Product | null }) {
   const [tracking, setTracking] = useState({ batch: false, serial: false, expiry: false })
   const toggle = (key: keyof typeof tracking) => setTracking((t) => ({ ...t, [key]: !t[key] }))
 
   return (
-    <div className="space-y-7">
+    <div className="space-y-6">
       <div>
         <SectionLabel>Inventory Rules</SectionLabel>
-        <div className="mt-4">
+        <div className="mt-3">
           <FieldGrid>
             <FieldWrap label="Batch">
               <TextInput type="number" value={0} onChange={() => {}} />
@@ -171,7 +270,8 @@ function InventorySection() {
             <FieldWrap label="Expiry Date">
               <input
                 type="date"
-                className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-400 focus:border-[#155DFC] focus:outline-none focus:ring-2 focus:ring-[#155DFC]/20"
+                defaultValue="2026-12-31"
+                className="h-[38px] w-full rounded-lg border border-slate-200 bg-white px-3 text-xs sm:text-[13px] text-slate-700 focus:border-[#2563EB] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/15"
               />
             </FieldWrap>
             <FieldWrap label="Negative Stocks">
@@ -183,7 +283,7 @@ function InventorySection() {
 
       <div>
         <SectionLabel>Tracking Configuration</SectionLabel>
-        <div className="mt-4 space-y-3">
+        <div className="mt-3 space-y-2.5">
           {(
             [
               ['batch', 'Enable Batch Tracking'],
@@ -196,9 +296,9 @@ function InventorySection() {
                 type="checkbox"
                 checked={tracking[key]}
                 onChange={() => toggle(key)}
-                className="h-4 w-4 rounded border-slate-300 accent-[#155DFC]"
+                className="h-4 w-4 rounded border-slate-300 accent-[#2563EB]"
               />
-              <span className="text-sm text-[#314158]">{label}</span>
+              <span className="text-xs sm:text-[13px] text-slate-700">{label}</span>
             </label>
           ))}
         </div>
@@ -207,64 +307,66 @@ function InventorySection() {
   )
 }
 
-/* ---------------- Pricing tab (design: margins + prices + effective dates) ---------------- */
+/* ---------------- Pricing Tab ---------------- */
 
-function PricingSection() {
+function PricingSection({ product }: { product?: Product | null }) {
   return (
     <FieldGrid>
       <FieldWrap label="Cost Price">
-        <TextInput type="number" value={0} onChange={() => {}} />
+        <TextInput type="number" value={product?.costPrice ?? 28500} onChange={() => {}} />
       </FieldWrap>
       <FieldWrap label="WSP Margin %">
-        <TextInput type="number" value={0} onChange={() => {}} />
+        <TextInput type="number" value={15} onChange={() => {}} />
       </FieldWrap>
       <FieldWrap label="RSP Margin %">
-        <TextInput type="number" value={0} onChange={() => {}} />
+        <TextInput type="number" value={22} onChange={() => {}} />
       </FieldWrap>
-      <FieldWrap label="WSP ( Whole Sale Price )">
-        <TextInput type="number" value={0} onChange={() => {}} />
+      <FieldWrap label="WSP ( Wholesale Price )">
+        <TextInput type="number" value={32000} onChange={() => {}} />
       </FieldWrap>
       <FieldWrap label="RSP ( Retail Sale Price )">
-        <TextInput type="number" value={0} onChange={() => {}} />
+        <TextInput type="number" value={product?.sellingPrice ?? 34999} onChange={() => {}} />
       </FieldWrap>
       <FieldWrap label="MRP ( Maximum Retail Price )">
-        <TextInput type="number" value={0} onChange={() => {}} />
+        <TextInput type="number" value={product?.mrp ?? 38500} onChange={() => {}} />
       </FieldWrap>
       <FieldWrap label="Price Effective From">
         <input
           type="date"
-          placeholder="select Date"
-          className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-400 focus:border-[#155DFC] focus:outline-none focus:ring-2 focus:ring-[#155DFC]/20"
+          defaultValue="2025-01-01"
+          className="h-[38px] w-full rounded-lg border border-slate-200 bg-white px-3 text-xs sm:text-[13px] text-slate-700 focus:border-[#2563EB] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/15"
         />
       </FieldWrap>
       <FieldWrap label="Price Effective To">
         <input
           type="date"
-          placeholder="select Date"
-          className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-400 focus:border-[#155DFC] focus:outline-none focus:ring-2 focus:ring-[#155DFC]/20"
+          defaultValue="2025-12-31"
+          className="h-[38px] w-full rounded-lg border border-slate-200 bg-white px-3 text-xs sm:text-[13px] text-slate-700 focus:border-[#2563EB] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/15"
         />
       </FieldWrap>
     </FieldGrid>
   )
 }
 
-/* ---------------- Tax tab (design: HSN + GST rate + tax group + cess) ---------------- */
+/* ---------------- Tax Tab ---------------- */
 
-function TaxSection() {
+function TaxSection({ product }: { product?: Product | null }) {
   return (
     <FieldGrid>
       <FieldWrap label="HSN Code" required>
-        <TextInput placeholder="e.g. 8517 12 90" />
+        <TextInput placeholder="e.g. 8517 12 90" value={product?.hsnSac || '8517 12 90'} onChange={() => {}} />
       </FieldWrap>
       <FieldWrap label="GST Rate" required>
         <SelectInput
           options={['0%', '5%', '12%', '18%', '28%']}
+          value="18%"
           placeholder="Select dropdown"
         />
       </FieldWrap>
       <FieldWrap label="Tax Group">
         <SelectInput
           options={['Electronics 18%', 'Apparel 12%', 'FMCG 18%', 'Grocery 5%']}
+          value="Electronics 18%"
           placeholder="Select dropdown"
         />
       </FieldWrap>
@@ -275,18 +377,18 @@ function TaxSection() {
   )
 }
 
-/* ---------------- Images tab (design: drag & drop dropzone) ---------------- */
+/* ---------------- Images Tab ---------------- */
 
 function ImagesSection() {
   return (
     <div className="rounded-xl border-2 border-dashed border-slate-200 py-12">
       <div className="flex flex-col items-center gap-1 text-center">
         <ImagePlus size={28} className="mb-2 text-slate-400" />
-        <p className="text-sm font-semibold text-[#314158]">Drag &amp; drop product images here</p>
-        <p className="text-xs text-[#6B7A99]">Supports JPEG, PNG, WEBP up to 5MB each</p>
+        <p className="text-sm font-semibold text-slate-700">Drag &amp; drop product images here</p>
+        <p className="text-xs text-slate-400">Supports JPEG, PNG, WEBP up to 5MB each</p>
         <button
           type="button"
-          className="mt-4 h-9 rounded-lg bg-[#155DFC] px-4 text-sm font-medium text-white transition hover:bg-[#1447E6]"
+          className="mt-4 h-9 rounded-lg bg-[#2563EB] px-4 text-xs sm:text-sm font-medium text-white transition hover:bg-[#1D4ED8] cursor-pointer"
         >
           Browse Files
         </button>
@@ -295,7 +397,7 @@ function ImagesSection() {
   )
 }
 
-/* ---------------- History tab (design: Audit Trail list) ---------------- */
+/* ---------------- History Tab (Figma Reference Image 1) ---------------- */
 
 type AuditEntry = {
   title: string
@@ -329,25 +431,25 @@ const AUDIT_TRAIL: AuditEntry[] = [
 function HistorySection() {
   return (
     <div>
-      <h3 className="mb-4 text-base font-semibold text-[#043793]">Audit Trail</h3>
+      <h3 className="mb-4 text-[14px] font-bold text-[#0F2A66] tracking-tight">
+        Audit Trail
+      </h3>
       <div className="divide-y divide-slate-100">
         {AUDIT_TRAIL.map((entry) => (
-          <div key={entry.title} className="flex gap-3.5 py-4 first:pt-0 last:pb-0">
-            <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#EFF6FF] text-[#155DFC]">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M3 12h3l3-8 4 16 3-8h5"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
+          <div key={entry.title} className="flex items-start gap-3.5 py-3.5">
+            <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#EBF3FE] text-[#2563EB]">
+              <Activity size={13.5} strokeWidth={2.2} className="text-[#2563EB]" />
             </span>
-            <div className="min-w-0">
-              <p className="text-sm font-semibold text-[#314158]">{entry.title}</p>
-              <p className="mt-0.5 text-sm text-[#314158]">{entry.detail}</p>
-              <p className="mt-0.5 text-sm text-[#6B7A99]">{entry.meta}</p>
+            <div className="min-w-0 flex-1">
+              <p className="text-[12.5px] font-semibold text-[#1E40AF] leading-snug">
+                {entry.title}
+              </p>
+              <p className="mt-0.5 text-[12px] text-slate-600 leading-snug">
+                {entry.detail}
+              </p>
+              <p className="mt-1 text-[11px] text-[#7185A5]">
+                {entry.meta}
+              </p>
             </div>
           </div>
         ))}
@@ -356,7 +458,7 @@ function HistorySection() {
   )
 }
 
-/* ---------------- Timeline tab (design: colored dot event list) ---------------- */
+/* ---------------- Timeline Tab (Figma Reference Image 3) ---------------- */
 
 type TimelineEvent = {
   title: string
@@ -365,26 +467,59 @@ type TimelineEvent = {
 }
 
 const TIMELINE: TimelineEvent[] = [
-  { title: 'Stock Received: 50 units (GRN-2501244)', date: 'Jan 14, 2025 09:15', dot: 'bg-emerald-500' },
-  { title: 'Price Updated: ₹32,999 → ₹34,999', date: 'Jan 12, 2025 14:32', dot: 'bg-blue-500' },
-  { title: 'Barcode Generated: EAN-13 #880609476…', date: 'Jan 10, 2025 11:20', dot: 'bg-fuchsia-500' },
-  { title: 'Low Stock Alert: below reorder level', date: 'Jan 08, 2025 08:45', dot: 'bg-amber-500' },
-  { title: 'Approval Granted by Arun Nair (Manager)', date: 'Jan 01, 2025 10:30', dot: 'bg-teal-500' },
-  { title: 'Product Created by Arjun Sharma', date: 'Jan 01, 2025 10:00', dot: 'bg-slate-400' },
+  {
+    title: 'Stock Received: 50 units (GRN-2501244)',
+    date: 'Jan 14, 2025 09:15',
+    dot: 'bg-[#10B981]',
+  },
+  {
+    title: 'Price Updated: ₹32,999 → ₹34,999',
+    date: 'Jan 12, 2025 14:32',
+    dot: 'bg-[#2563EB]',
+  },
+  {
+    title: 'Barcode Generated: EAN-13 #880609476…',
+    date: 'Jan 10, 2025 11:20',
+    dot: 'bg-[#9333EA]',
+  },
+  {
+    title: 'Low Stock Alert: below reorder level',
+    date: 'Jan 08, 2025 08:45',
+    dot: 'bg-[#F59E0B]',
+  },
+  {
+    title: 'Approval Granted by Arun Nair (Manager)',
+    date: 'Jan 01, 2025 10:30',
+    dot: 'bg-[#0D9488]',
+  },
+  {
+    title: 'Product Created by Arjun Sharma',
+    date: 'Jan 01, 2025 10:00',
+    dot: 'bg-[#64748B]',
+  },
 ]
 
 function TimelineSection() {
   return (
-    <div className="relative">
-      {/* Vertical guide line through the dots */}
-      <span className="absolute top-2 bottom-2 left-[5px] w-px bg-slate-200" aria-hidden />
-      <div className="space-y-5">
+    <div className="relative pt-1">
+      {/* Continuous vertical guide line accurately centered through the dots */}
+      <span
+        className="absolute top-2.5 bottom-3.5 left-[10px] w-[1.5px] bg-[#E2E8F0]"
+        aria-hidden="true"
+      />
+      <div className="space-y-5.5">
         {TIMELINE.map((event) => (
-          <div key={event.title} className="relative flex gap-4 pl-0.5">
-            <span className={`relative z-10 mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full ${event.dot}`} />
-            <div className="min-w-0">
-              <p className="text-sm font-semibold text-[#314158]">{event.title}</p>
-              <p className="mt-0.5 text-xs text-[#6B7A99]">{event.date}</p>
+          <div key={event.title} className="relative flex items-start gap-3.5 pl-0.5">
+            <span
+              className={`relative z-10 mt-1 h-2 w-2 shrink-0 rounded-full ring-2 ring-white ${event.dot}`}
+            />
+            <div className="min-w-0 flex-1">
+              <p className="text-[12.5px] font-semibold text-[#0F2A66] leading-snug">
+                {event.title}
+              </p>
+              <p className="mt-0.5 text-[11px] text-[#7185A5] leading-snug">
+                {event.date}
+              </p>
             </div>
           </div>
         ))}
@@ -393,123 +528,241 @@ function TimelineSection() {
   )
 }
 
-/* ---------------- Footer (two variants per design) ---------------- */
+/* ---------------- Drawer Footers ---------------- */
 
-function CreateFooter({ onClose }: { onClose: () => void }) {
+function CreateFooter({
+  onClose,
+  onCreate,
+  onSaveDraft,
+}: {
+  onClose: () => void
+  onCreate: () => void
+  onSaveDraft: () => void
+}) {
   return (
-    <div className="flex items-center justify-end gap-3 border-t border-slate-100 px-7 py-4">
+    <div className="flex-shrink-0 flex items-center justify-end gap-2.5 border-t border-slate-200 bg-white px-6 py-3">
       <button
         type="button"
         onClick={onClose}
-        className="h-10 rounded-lg border border-slate-200 px-5 text-sm font-medium text-[#314158] transition hover:bg-slate-50"
+        className="h-9 rounded-lg border border-slate-300 bg-white px-4 text-xs font-medium text-slate-700 transition hover:bg-slate-50 cursor-pointer shadow-2xs"
       >
         Cancel
       </button>
       <button
         type="button"
-        className="h-10 rounded-lg border border-slate-200 bg-white px-5 text-sm font-medium text-[#314158] transition hover:bg-slate-50"
+        onClick={onSaveDraft}
+        className="h-9 rounded-lg border border-slate-300 bg-white px-4 text-xs font-medium text-slate-700 transition hover:bg-slate-50 cursor-pointer shadow-2xs"
       >
         Save as Draft
       </button>
       <button
         type="button"
-        className="flex h-10 items-center gap-2 rounded-lg bg-[#155DFC] px-5 text-sm font-medium text-white transition hover:bg-[#1447E6]"
+        onClick={onCreate}
+        className="flex h-9 items-center gap-1.5 rounded-lg bg-[#2563EB] px-4 text-xs font-medium text-white transition hover:bg-[#1D4ED8] cursor-pointer shadow-xs"
       >
-        <Check size={16} />
-        Create Product
+        <Check size={14} className="stroke-[2.5]" />
+        <span>Create Product</span>
       </button>
     </div>
   )
 }
 
-function ViewFooter({ onClose }: { onClose: () => void }) {
+function ViewFooter({
+  onClose,
+  onEdit,
+}: {
+  onClose: () => void
+  onEdit?: () => void
+}) {
   return (
-    <div className="flex items-center justify-end gap-3 border-t border-slate-100 px-7 py-4">
+    <div className="flex-shrink-0 flex items-center justify-end gap-2.5 border-t border-slate-200 bg-white px-6 py-3">
       <button
         type="button"
         onClick={onClose}
-        className="h-10 rounded-lg border border-slate-200 px-5 text-sm font-medium text-[#314158] transition hover:bg-slate-50"
+        className="h-9 rounded-lg border border-slate-300 bg-white px-4 text-xs font-medium text-slate-700 transition hover:bg-slate-50 cursor-pointer shadow-2xs"
       >
         Close
       </button>
       <button
         type="button"
-        className="flex h-10 items-center gap-2 rounded-lg border border-slate-200 bg-white px-5 text-sm font-medium text-[#314158] transition hover:bg-slate-50"
+        onClick={() => window.print()}
+        className="flex h-9 items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-4 text-xs font-medium text-slate-700 transition hover:bg-slate-50 cursor-pointer shadow-2xs"
       >
-        <Printer size={15} />
-        Print
+        <Printer size={13.5} className="text-slate-500" />
+        <span>Print</span>
       </button>
       <button
         type="button"
-        className="flex h-10 items-center gap-2 rounded-lg bg-[#155DFC] px-5 text-sm font-medium text-white transition hover:bg-[#1447E6]"
+        onClick={onEdit}
+        className="flex h-9 items-center gap-1.5 rounded-lg bg-[#2563EB] px-4 text-xs font-medium text-white transition hover:bg-[#1D4ED8] cursor-pointer shadow-xs"
       >
-        <SquarePen size={15} />
-        Edit Product
+        <SquarePen size={13.5} />
+        <span>Edit Product</span>
       </button>
     </div>
   )
 }
 
-/* ---------------- Drawer root ---------------- */
+/* ---------------- Drawer Root Component ---------------- */
 
 type Props = {
   isOpen: boolean
   onClose: () => void
-  /** When set, the drawer shows the product detail view (History/Timeline, Edit footer). */
+  /** When set, the drawer shows product detail view (History/Timeline, Edit footer). */
   product?: Product | null
+  /** Callback when product is created or updated */
+  onProductCreated?: (product: Partial<Product>) => void
 }
 
-export default function CreateProductDrawer({ isOpen, onClose, product }: Props) {
-  const [activeTab, setActiveTab] = useState<DrawerTabKey>('general')
+export default function CreateProductDrawer({ isOpen, onClose, product, onProductCreated }: Props) {
   const isView = !!product
+  const [activeTab, setActiveTab] = useState<DrawerTabKey>('history')
 
-  const tabs = isView ? VIEW_TABS : FORM_TABS
-  const current = tabs.includes(activeTab) ? activeTab : 'general'
+  const [formData, setFormData] = useState<ProductFormData>({
+    productCode: '',
+    oemCode: 'PRD-001',
+    productName: '',
+    group: 'Electronics',
+    department: 'Electronics',
+    section: 'Mobiles',
+    brand: 'Samsung',
+    uom: 'PCS',
+    productType: 'Finished Good',
+    vendor: 'Samsung India Pvt Ltd',
+    attr1: 'Color',
+    attr2: 'Storage',
+    status: 'Active',
+  })
+
+  // Synchronize initial state when opening drawer
+  useEffect(() => {
+    if (isOpen) {
+      if (product) {
+        setActiveTab('history')
+        setFormData({
+          productCode: product.productCode || '',
+          oemCode: product.prdCode || 'PRD-001',
+          productName: product.productName || '',
+          group: product.group || 'Electronics',
+          department: product.department || 'Electronics',
+          section: product.section || 'Mobiles',
+          brand: product.brand || 'Samsung',
+          uom: product.uom || 'PCS',
+          productType: 'Finished Good',
+          vendor: 'Samsung India Pvt Ltd',
+          attr1: 'Color',
+          attr2: 'Storage',
+          status: product.status || 'Active',
+        })
+      } else {
+        setActiveTab('general')
+        setFormData({
+          productCode: '',
+          oemCode: 'PRD-001',
+          productName: '',
+          group: 'Electronics',
+          department: 'Electronics',
+          section: 'Mobiles',
+          brand: 'Samsung',
+          uom: 'PCS',
+          productType: 'Finished Good',
+          vendor: 'Samsung India Pvt Ltd',
+          attr1: 'Color',
+          attr2: 'Storage',
+          status: 'Active',
+        })
+        setActiveTab('history')
+      }
+    }
+  }, [isOpen, product?.id])
+
+  const tabs = ALL_TABS
+  const current = activeTab
+
+  const handleCreate = () => {
+    if (!formData.productName.trim()) {
+      toast.error('Please enter a product name')
+      return
+    }
+    const newCode = `PRD-${Date.now().toString().slice(-4)}`
+    toast.success('Product created successfully!')
+    onProductCreated?.({
+      id: String(Date.now()),
+      productCode: newCode,
+      productName: formData.productName,
+      group: formData.group,
+      department: formData.department,
+      section: formData.section,
+      brand: formData.brand,
+      uom: formData.uom,
+      status: 'Active',
+    })
+    onClose()
+  }
+
+  const handleSaveDraft = () => {
+    toast.success('Product saved as draft')
+    onClose()
+  }
 
   const sectionMap: Record<DrawerTabKey, React.ReactNode> = {
-    general: <GeneralSection />,
-    inventory: <InventorySection />,
-    pricing: <PricingSection />,
-    tax: <TaxSection />,
+    general: <GeneralSection formData={formData} setFormData={setFormData} />,
+    inventory: <InventorySection product={product} />,
+    pricing: <PricingSection product={product} />,
+    tax: <TaxSection product={product} />,
     images: <ImagesSection />,
     history: <HistorySection />,
     timeline: <TimelineSection />,
   }
 
   return (
-    <Drawer isOpen={isOpen} onClose={onClose} size="xl">
-      {/* Header (design: big blue title + subtitle, bare × at top-right) */}
-      <div className="flex items-start justify-between px-7 pt-6 pb-4">
-        <div>
-          <h2 className="text-2xl font-bold text-[#043793]">
-            {isView ? product!.productName : 'Create New Product'}
-          </h2>
-          <p className="mt-1 text-sm text-[#6B7A99]">
-            {isView
-              ? `${product!.productCode} · ${product!.department} · ${product!.brand}`
-              : 'Fill in the details to add a new product to the catalog'}
-          </p>
+    <Drawer isOpen={isOpen} onClose={onClose} size="productDetail" raw>
+      <div className="flex flex-col h-full bg-white select-none">
+        {/* Header - Unified seamlessly with Tab Bar without separating border */}
+        <div className="flex-shrink-0 flex items-start justify-between px-6 pt-5 pb-3 bg-white">
+          <div>
+            <h2 className="text-[20px] font-bold text-[#0F2A66] leading-tight tracking-tight">
+              {isView || activeTab === 'history' || activeTab === 'timeline'
+                ? (product?.productName || 'Samsung Galaxy A54 5G')
+                : 'Create New Product'}
+            </h2>
+            <p className="mt-1 text-[12px] text-slate-500 font-normal leading-normal">
+              {isView || activeTab === 'history' || activeTab === 'timeline'
+                ? `${product?.productCode || 'ELE-SAM-A54'} · ${product?.category || product?.department || product?.group || 'Electronics'} · ${product?.brand || 'Samsung'}`
+                : 'Fill in the details to add a new product to the catalog'}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-slate-400 hover:text-slate-700 transition p-1 -mr-1 -mt-0.5 cursor-pointer rounded-lg hover:bg-slate-100"
+            aria-label="Close drawer"
+          >
+            <X size={18} />
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={onClose}
-          className="mt-1 text-slate-400 transition hover:text-slate-600"
-          aria-label="Close"
-        >
-          <X size={20} />
-        </button>
+
+        {/* Tab Bar with bottom border */}
+        <div className="flex-shrink-0">
+          <DrawerTabBar active={current} onChange={setActiveTab} tabs={tabs} />
+        </div>
+
+        {/* Scrollable Content Body */}
+        <div className="flex-1 overflow-y-auto px-6 py-5 bg-white">
+          {sectionMap[current]}
+        </div>
+
+        {/* Sticky/Fixed Footer */}
+        {isView || activeTab === 'history' || activeTab === 'timeline' ? (
+          <ViewFooter onClose={onClose} onEdit={() => setActiveTab('general')} />
+        ) : (
+          <CreateFooter
+            onClose={onClose}
+            onCreate={handleCreate}
+            onSaveDraft={handleSaveDraft}
+          />
+        )}
       </div>
-
-      <DrawerTabBar active={current} onChange={setActiveTab} tabs={tabs} />
-
-      {/* Scrollable body is provided by the shared Drawer; keep rhythm tight */}
-      <div className="px-7 py-6">{sectionMap[current]}</div>
-
-      {isView ? (
-        <ViewFooter onClose={onClose} />
-      ) : (
-        <CreateFooter onClose={onClose} />
-      )}
     </Drawer>
   )
 }

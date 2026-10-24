@@ -11,6 +11,7 @@ import { exportToPDF, exportToCSV, ExportColumn } from '@/utils/exportData'
 import toast from "react-hot-toast"
 import { useAuth } from "@/context/AuthContext";
 
+
 export interface OrganizationUnit {
   id: number;
   organizationUnit: string;
@@ -47,7 +48,7 @@ const orgUnitColumns: ExportColumn<OrganizationUnit>[] = [
 
 function OrganizationUnit() {
 
-  const { hasPermission, permissions, user } = useAuth();
+  const { hasPermission } = useAuth();
 
 //This RBAC check ensures that only users with the "ORG_UNIT_VIEW" permission can access the Organization Unit page. If a user lacks this permission, they will see a message indicating that they do not have access to view Organization Units.
     if (!hasPermission("ORG_UNIT_VIEW")) {

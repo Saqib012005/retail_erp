@@ -19,7 +19,7 @@ export function FieldWrap({ label, required, children, className = '' }: FieldWr
 }
 
 const baseInput =
-  'h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-[#314158] placeholder:text-slate-400 focus:border-[#155DFC] focus:outline-none focus:ring-2 focus:ring-[#155DFC]/20 disabled:bg-slate-50 disabled:text-slate-400'
+  'h-[38px] w-full rounded-lg border border-slate-200 bg-white px-3.5 text-xs sm:text-[13px] text-slate-800 placeholder:text-slate-400 focus:border-[#2563EB] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/15 disabled:bg-[#F8FAFC] disabled:text-slate-400 disabled:cursor-not-allowed transition'
 
 export function TextInput({
   placeholder,

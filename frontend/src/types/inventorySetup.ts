@@ -7,20 +7,26 @@ export type ProductStatus = StatusType // Active | Inactive | ...
 export type Product = {
   id: string
   productCode: string // e.g. ELE-SAM-A54
+  prdCode?: string // e.g. PRD-001
   productName: string
   department: string
   section: string
   category: string
   subCategory: string
+  group?: string
   brand: string
   uom: string
   hsnSac: string
   costPrice: number
   mrp: number
   sellingPrice: number
+  cost?: string | number
+  rsp?: string | number
+  stock?: number
   status: ProductStatus
   imageCount: number
   lastModified: string
+  modified?: string
   modifiedBy: string
 }
 
@@ -52,6 +58,9 @@ export type Brand = {
   description: string
   productCount: number
   status: ProductStatus
+  country?: string
+  websiteUrl?: string
+  logoUrl?: string
   // Optional brand card customization (per design: colored monogram tile)
   color?: string // tailwind bg class e.g. bg-[#EFF6FF]
   textColor?: string
@@ -251,5 +260,6 @@ export type Bundle = {
   type: BundleType
   components: BundleComponent[]
   totalCost: number
+  sellPrice?: number
   status: ProductStatus
 }

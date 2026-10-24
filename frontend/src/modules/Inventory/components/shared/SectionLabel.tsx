@@ -10,9 +10,9 @@ export default function SectionLabel({ children }: { children: ReactNode }) {
 /** Field label inside drawers, e.g. "Tax Group" (with optional required marker). */
 export function FieldLabel({ children, required }: { children: ReactNode; required?: boolean }) {
   return (
-    <span className="text-xs font-medium text-[#314158]">
+    <span className="text-[12px] font-medium text-slate-700">
       {children}
-      {required && <span className="ml-0.5 text-[#E7000B]">*</span>}
+      {required && <span className="ml-0.5 text-red-500 font-medium">*</span>}
     </span>
   )
 }

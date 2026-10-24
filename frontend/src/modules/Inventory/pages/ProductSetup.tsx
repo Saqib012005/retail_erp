@@ -15,23 +15,27 @@ import KittingTab from '../components/kitting/KittingTab'
 export default function ProductSetup() {
   return (
     <div className="page-shell">
-      {/* In-page 11-tab toolbar (breadcrumb lives in the TopBar) */}
-      <div className="flex gap-1 overflow-x-auto border-b border-slate-200 pb-px">
-        {PRODUCT_SETUP_TABS.map((tab) => (
-          <NavLink
-            key={tab.key}
-            to={`/inventory/product-setup/${tab.key}`}
-            className={({ isActive }) =>
-              `shrink-0 whitespace-nowrap border-b-2 px-4 py-2.5 text-sm font-medium transition ${
-                isActive
-                  ? 'border-[#155DFC] text-[#155DFC]'
-                  : 'border-transparent text-slate-500 hover:text-[#155DFC]'
-              }`
-            }
-          >
-            {tab.label}
-          </NavLink>
-        ))}
+      {/* In-page 9-tab toolbar */}
+      <div className="flex items-center gap-5 sm:gap-6 overflow-x-auto border-b border-slate-200 bg-white px-4 sm:px-6 scrollbar-none">
+        {PRODUCT_SETUP_TABS.map((tab) => {
+          const Icon = tab.icon;
+          return (
+            <NavLink
+              key={tab.key}
+              to={`/inventory/product-setup/${tab.key}`}
+              className={({ isActive }) =>
+                `flex items-center gap-2 shrink-0 whitespace-nowrap border-b-2 py-3 px-1 text-xs sm:text-[13px] font-medium transition-colors ${
+                  isActive
+                    ? 'border-[#155DFC] text-[#155DFC] font-semibold -mb-[1px]'
+                    : 'border-transparent text-slate-600 hover:text-slate-900'
+                }`
+              }
+            >
+              <Icon size={15} className="shrink-0" />
+              <span>{tab.label}</span>
+            </NavLink>
+          );
+        })}
       </div>
 
       {/* Tab content */}
