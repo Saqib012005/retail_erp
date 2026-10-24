@@ -10,95 +10,88 @@ import {
   CheckCircle2,
 } from 'lucide-react'
 import DateRangeDropdown, { type DateRange } from '../components/UserLogs/DateRangeDropdown'
+import {useUserLogs } from '@/hooks/securities/userLogshooks'
+import {  type Severity } from '@/types/securities/securities.types'  
 
-type Severity = 'Info' | 'Warning' | 'Error' | 'Success'
-
-type AuditLog = {
-  id: string
-  severity: Severity
-  action: string
-  module: string
-  actor: string
-  detail: string
-  timestamp: Date
-  ip: string
-  diff?: { before: unknown; after: unknown }
-}
-
-const LOGS: AuditLog[] = [
-  {
-    id: 'log-1',
-    severity: 'Warning',
-    action: 'ROLE_PERMISSION_UPDATE',
-    module: 'Securities',
-    actor: 'Admin User',
-    detail: 'Role: Branch Manager',
-    timestamp: new Date(2026, 4, 21, 14, 32, 18),
-    ip: '10.0.1.14',
-    diff: {
-      before: { permissions: ['View Ledger'] },
-      after: { permissions: ['View Ledger', 'Edit Ledger', 'Delete Ledger'] },
-    },
-  },
-  {
-    id: 'log-2',
-    severity: 'Info',
-    action: 'LEDGER_CREATE',
-    module: 'Finance',
-    actor: 'Priya Sharma',
-    detail: 'Ledger: Sales - Export',
-    timestamp: new Date(2026, 4, 21, 13, 48, 5),
-    ip: '10.0.1.22',
-  },
-  {
-    id: 'log-3',
-    severity: 'Error',
-    action: 'LOGIN_FAILED',
-    module: 'Auth',
-    actor: 'System',
-    detail: 'User: unknown@hack.com',
-    timestamp: new Date(2026, 4, 21, 12, 15, 44),
-    ip: '192.168.99.12',
-  },
-  {
-    id: 'log-4',
-    severity: 'Info',
-    action: 'ORG_UNIT_UPDATE',
-    module: 'Organization',
-    actor: 'Raj Kumar',
-    detail: 'Org Unit: Delhi North',
-    timestamp: new Date(2026, 4, 21, 11, 2, 31),
-    ip: '10.0.2.08',
-  },
-  {
-    id: 'log-5',
-    severity: 'Success',
-    action: 'EINVOICE_GENERATE',
-    module: 'Utilities',
-    actor: 'Meena Joshi',
-    detail: 'Invoice: INV-2024-0890',
-    timestamp: new Date(2026, 4, 21, 10, 22, 18),
-    ip: '10.0.1.31',
-  },
-  {
-    id: 'log-6',
-    severity: 'Success',
-    action: 'DATA_IMPORT_COMPLETE',
-    module: 'Utilities',
-    actor: 'System',
-    detail: 'Import: ledger_master.csv',
-    timestamp: new Date(2026, 4, 21, 9, 12, 0),
-    ip: '10.0.0.1',
-  },
-]
-
-const FILTERS: Array<'All' | Severity> = ['All', 'Info', 'Warning', 'Error', 'Success']
+// const LOGS: AuditLog[] = [
+//   {
+//     id: 'log-1',
+//     severity: 'Warning',
+//     action: 'ROLE_PERMISSION_UPDATE',
+//     module: 'Securities',
+//     actor: 'Admin User',
+//     detail: 'Role: Branch Manager',
+//     timestamp: new Date(2026, 4, 21, 14, 32, 18),
+//     ip: '10.0.1.14',
+//     diff: {
+//       before: { permissions: ['View Ledger'] },
+//       after: { permissions: ['View Ledger', 'Edit Ledger', 'Delete Ledger'] },
+//     },
+//   },
+//   {
+//     id: 'log-2',
+//     severity: 'Info',
+//     action: 'LEDGER_CREATE',
+//     module: 'Finance',
+//     actor: 'Priya Sharma',
+//     detail: 'Ledger: Sales - Export',
+//     timestamp: new Date(2026, 4, 21, 13, 48, 5),
+//     ip: '10.0.1.22',
+//   },
+//   {
+//     id: 'log-3',
+//     severity: 'Error',
+//     action: 'LOGIN_FAILED',
+//     module: 'Auth',
+//     actor: 'System',
+//     detail: 'User: unknown@hack.com',
+//     timestamp: new Date(2026, 4, 21, 12, 15, 44),
+//     ip: '192.168.99.12',
+//   },
+//   {
+//     id: 'log-4',
+//     severity: 'Info',
+//     action: 'ORG_UNIT_UPDATE',
+//     module: 'Organization',
+//     actor: 'Raj Kumar',
+//     detail: 'Org Unit: Delhi North',
+//     timestamp: new Date(2026, 4, 21, 11, 2, 31),
+//     ip: '10.0.2.08',
+//   },
+//   {
+//     id: 'log-5',
+//     severity: 'Success',
+//     action: 'EINVOICE_GENERATE',
+//     module: 'Utilities',
+//     actor: 'Meena Joshi',
+//     detail: 'Invoice: INV-2024-0890',
+//     timestamp: new Date(2026, 4, 21, 10, 22, 18),
+//     ip: '10.0.1.31',
+//   },
+//   {
+//     id: 'log-6',
+//     severity: 'Success',
+//     action: 'DATA_IMPORT_COMPLETE',
+//     module: 'Utilities',
+//     actor: 'System',
+//     detail: 'Import: ledger_master.csv',
+//     timestamp: new Date(2026, 4, 21, 9, 12, 0),
+//     ip: '10.0.0.1',
+//   },
+// ]
+const FILTERS: Array<'All' | Severity> = [
+  'All',
+  'INFO',
+  'WARNING',
+  'ERROR',
+  'SUCCESS',
+];
 
 const SEVERITY_META: Record<Severity, { icon: typeof Info; badge: string; text: string }> = {
-  Info: { icon: Info, badge: 'bg-blue-50 text-blue-600', text: 'text-blue-600' },
-  Warning: { icon: AlertTriangle, badge: 'bg-amber-50 text-amber-600', text: 'text-amber-600' },
-  Error: { icon: XCircle, badge: 'bg-rose-50 text-rose-600', text: 'text-rose-600' },
-  Success: { icon: CheckCircle2, badge: 'bg-emerald-50 text-emerald-600', text: 'text-emerald-600' },
+  INFO: { icon: Info, badge: 'bg-blue-50 text-blue-600', text: 'text-blue-600' },
+  WARNING: { icon: AlertTriangle, badge: 'bg-amber-50 text-amber-600', text: 'text-amber-600' },
+  ERROR: { icon: XCircle, badge: 'bg-rose-50 text-rose-600', text: 'text-rose-600' },
+  SUCCESS: { icon: CheckCircle2, badge: 'bg-emerald-50 text-emerald-600', text: 'text-emerald-600' },
 }
 
 const MODULE_STYLES: Record<string, string> = {
@@ -112,9 +105,20 @@ const MODULE_STYLES: Record<string, string> = {
 
 
 function formatDateTime(d: Date) {
-  const date = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
-  const time = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })
-  return `${date} ${time}`
+  const date = d.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
+
+  const time = d.toLocaleTimeString('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  });
+
+  return `${date} ${time}`;
 }
 
 function endOfDay(d: Date) {
@@ -124,29 +128,41 @@ function endOfDay(d: Date) {
 export default function UserLogs() {
   const [activeFilter, setActiveFilter] = useState<'All' | Severity>('All')
   const [query, setQuery] = useState('')
-  const [expandedId, setExpandedId] = useState<string | null>('log-1')
+  const [expandedId, setExpandedId] = useState<number | null>(null)
 
   const [isDateOpen, setIsDateOpen] = useState(false)
   const [dateRange, setDateRange] = useState<DateRange>({ start: null, end: null })
 
+const {
+  data: logsResponse,
+} = useUserLogs();
+
+const logs = logsResponse?.data ?? [];
+console.log('logs', logs) 
+console.log('First log:', logs[0]);
+console.log('Number of logs:', logs.length);
+
   const filteredLogs = useMemo(() => {
     const q = query.trim().toLowerCase()
-    return LOGS.filter((log) => {
-      const matchesFilter = activeFilter === 'All' || log.severity === activeFilter
+    return logs.filter((log) => {
+      const matchesFilter = activeFilter === 'All' || log.level === activeFilter
       const matchesQuery =
         !q ||
-        log.actor.toLowerCase().includes(q) ||
-        log.action.toLowerCase().includes(q) ||
-        log.module.toLowerCase().includes(q) ||
-        log.detail.toLowerCase().includes(q)
+       String(log.userName ?? '').toLowerCase().includes(q) ||
+  String(log.action ?? '').toLowerCase().includes(q) ||
+  String(log.module ?? '').toLowerCase().includes(q) ||
+  String(log.description ?? '').toLowerCase().includes(q);
+
+  const logDate = new Date(log.createdAt);
+
       const matchesDate =
         !dateRange.start ||
-        (log.timestamp >= dateRange.start && log.timestamp <= endOfDay(dateRange.end ?? dateRange.start))
+        (logDate >= dateRange.start && logDate <= endOfDay(dateRange.end ?? dateRange.start))
       return matchesFilter && matchesQuery && matchesDate
     })
-  }, [activeFilter, query, dateRange])
+  }, [logs, activeFilter, query, dateRange])
 
-  function toggleExpanded(id: string) {
+  function toggleExpanded(id: number) {
     setExpandedId((prev) => (prev === id ? null : id))
   }
 
@@ -231,7 +247,9 @@ export default function UserLogs() {
           <div className="px-6 py-12 text-center text-sm text-slate-400">No matching log entries.</div>
         ) : (
           filteredLogs.map((log, idx) => {
-            const meta = SEVERITY_META[log.severity]
+             const meta = SEVERITY_META[
+  (log.level.charAt(0).toUpperCase() + log.level.slice(1)) as Severity
+];
             const SeverityIcon = meta.icon
             const isExpanded = expandedId === log.id
             const canExpand = Boolean(log.diff)
@@ -250,7 +268,7 @@ export default function UserLogs() {
                     </span>
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className={`text-[13px] font-semibold tracking-wide ${meta.text}`}>{log.severity}</span>
+                        <span className={`text-[13px] font-semibold tracking-wide ${meta.text}`}>{log.level}</span>
                         <span className="text-[13px] font-semibold text-[#043793]">{log.action}</span>
                         <span
                           className={`rounded-md px-2 py-0.5 text-[11px] font-medium ${MODULE_STYLES[log.module] ?? 'bg-slate-100 text-slate-600'
@@ -260,15 +278,15 @@ export default function UserLogs() {
                         </span>
                       </div>
                       <p className="mt-1 text-xs text-slate-400">
-                        {log.actor} · {log.detail}
+                        {log.userName} · {log.description}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex shrink-0 items-center gap-3">
                     <div className="text-right">
-                      <div className="text-xs text-slate-500">{formatDateTime(log.timestamp)}</div>
-                      <div className="text-xs text-slate-300">IP {log.ip}</div>
+                      <div className="text-xs text-slate-500">{formatDateTime(new Date(log.createdAt))}</div>
+                      <div className="text-xs text-slate-300">IP {log.ipAddress}</div>
                     </div>
                     {canExpand && (
                       <ChevronDown

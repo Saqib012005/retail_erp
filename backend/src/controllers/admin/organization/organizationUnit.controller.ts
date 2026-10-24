@@ -46,8 +46,8 @@ export const createOrgUnitController = async (
 
      await logOrgUnitAction(
       req,
-      "Created Organization Unit",
-      `Created organization unit: ${result.organizationUnit ?? result.id}`
+      "CREATED ORG_UNIT",
+      `org_unit: ${result.organizationUnit }`
     );
 
     return res.status(201).json({
@@ -145,8 +145,8 @@ export const updateOrgUnitController = async (
     );
     await logOrgUnitAction(
       req,
-      "Updated Organization Unit",
-      `Updated organization unit: ${result.organizationUnit ?? result.id}`
+      "UPDATED ORG_UNIT",
+      `org_unit: ${result.organizationUnit }`
     );
 
     return res.status(200).json({
@@ -182,8 +182,8 @@ export const deleteOrgUnitController = async (
 
      await logOrgUnitAction(
       req,
-      "Deleted Organization unit",
-      `Deleted organization unit: ${result.organizationUnit ?? result.id}`
+      "DELETED ORG_UNIT",
+      `org_unit: ${result.organizationUnit }`
     );
 
 

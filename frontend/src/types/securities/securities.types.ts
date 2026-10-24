@@ -17,4 +17,20 @@ export type RoleType=
         createdAt:string;
         updatedAt:string;
     }
-   
+
+
+    /*User Logs Types*/
+
+    export type Severity = 'INFO' | 'WARNING' | 'ERROR' | 'SUCCESS';
+    export type AuditLog = {
+    id: number;
+  level: Severity;
+  action: string;
+  module: string;
+  userId: number;
+  userName: string | null;
+  description: string | null;
+  createdAt: string;
+  ipAddress: string | null;
+ diff?: { before: unknown; after: unknown }
+}

@@ -2,6 +2,8 @@ import { Request, Response } from 'express'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import prisma from '../../config/prisma.js'
+import { AuthRequest } from "../../middleware/auth.middleware.js";
+import { createAuditLog } from "../../services/admin/userLogs.service.js";
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -44,6 +46,30 @@ export const register = async (req: Request, res: Response) => {
   }
 }
 
+
+const logAuthAction = async(
+  req: AuthRequest,
+  action:string,
+  description:string,
+  level: "SUCCESS" | "ERROR" | "WARNING" | "INFO" = "SUCCESS"
+): Promise<void> => {
+  try{
+    await createAuditLog({
+      level,
+      action,
+      module:'Auth',
+      userId:req.user?.id ?? null,
+      userName : req.user?.email ?? null,
+      description,
+      ipAddress:req.ip
+    })
+  }
+  catch (error) {
+    console.error("Failed to login", error);
+     
+  }
+}
+
 export const login = async (req: Request, res: Response) => {
   try {
     const body = req.body ?? {};
@@ -67,6 +93,13 @@ export const login = async (req: Request, res: Response) => {
     });
 
     if (!user) {
+      await logAuthAction(
+        req,
+        "LOGIN_FAILED",
+        `Failed login attempt for email: ${email}`,
+         "ERROR"
+      );
+
       return res.status(401).json({
         message: "Invalid email or password",
       });
@@ -78,6 +111,12 @@ export const login = async (req: Request, res: Response) => {
     );
 
     if (!isPasswordValid) {
+      await logAuthAction(
+        req,
+        "LOGIN_FAILED",
+        'Invalid password',
+          "ERROR"
+      );
       return res.status(401).json({
         message: "Invalid email or password",
       });
@@ -121,6 +160,12 @@ export const login = async (req: Request, res: Response) => {
 
     if (!secret) {
       console.error("JWT_SECRET is not configured");
+      await logAuthAction(
+        req,
+        "LOGIN_FAILED",
+        "Server authentication configuration error",
+          "ERROR" 
+      );
       return res.status(500).json({
         message: "Server authentication configuration error",
       });
@@ -134,7 +179,12 @@ export const login = async (req: Request, res: Response) => {
       secret,
       { expiresIn: "1d" }
     );
-
+ await logAuthAction(
+      req,
+      "LOGIN_SUCCESS",
+      `User logged in successfully: ${user.email}`,
+      "SUCCESS"
+    );
     return res.json({
       message: "Login successful",
       token,

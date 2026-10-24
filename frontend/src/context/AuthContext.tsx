@@ -50,6 +50,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
     console.log("Before navigate:", window.location.pathname);
   }
 
+
+
+
  const logout = () => {
   console.log("Logout clicked");
 
