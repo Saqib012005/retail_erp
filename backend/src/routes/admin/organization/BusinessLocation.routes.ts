@@ -17,20 +17,20 @@ router.use(authMiddleware);
 
 // CREATE
 router.post(
-  "/businessLocation",
+  "/",
   authorize("BUSINESS_LOCATION_CREATE"),
   createBusinessLocationController
 );
 
 // GET ALL
 router.get(
-  "/businessLocation",
+  "/",
   authorize("BUSINESS_LOCATION_VIEW"),
   getBusinessLocationController
 );
 
 router.get(
-  "/businessLocation/:id",
+  "/:id",
   authorize("BUSINESS_LOCATION_VIEW"),
   requireScope({
     resource: "businessLocation",
@@ -42,7 +42,7 @@ router.get(
 
 // UPDATE
 router.put(
-  "/businessLocation/:id",
+  "/:id",
   authorize("BUSINESS_LOCATION_EDIT"),
   requireScope({
     resource: "businessLocation",
@@ -54,7 +54,7 @@ router.put(
 
 // DELETE
 router.delete(
-  "/businessLocation/:id",
+  "/:id",
   authorize("BUSINESS_LOCATION_DELETE"),
   requireScope({
     resource: "businessLocation",

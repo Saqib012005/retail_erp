@@ -5,6 +5,32 @@ import type {
   
 } from '../../../types/businessLocation.types.js';
 import {createBusinessLocation,getBusinessLocationData,getBusinessLocationById,deleteBusinessLoaction,updateBusinessLocation} from '../../../services/admin/organization/BusinessLocation.service.js'
+import { createAuditLog } from "../../../services/admin/userLogs.service.js";
+import { AuthRequest } from "../../../middleware/auth.middleware.js";
+
+const logOrgUnitAction = async (
+  req: AuthRequest,
+  action: string,
+  description: string,
+  level: "SUCCESS" | "ERROR" | "WARNING" | "INFO" = "SUCCESS"
+): Promise<void> => {
+
+  
+  try {
+    await createAuditLog({
+      level,
+      action,
+      module: "Business Location",
+      userId: req.user?.id ?? null,
+      userName: req.user?.email ?? null,
+      description,
+      ipAddress: req.ip,
+    });
+  } catch (error) {
+    console.error("Failed to create business location", error);
+     
+  }
+};
 
 export const createBusinessLocationController = async (
   req: Request,
@@ -21,7 +47,11 @@ export const createBusinessLocationController = async (
     }
 
     const location = await createBusinessLocation(data);
-
+      await logOrgUnitAction(
+      req,
+      "CREATED BUSINESS_LOCATION",
+      `business_location: ${req.body.locationName }`
+    );
     return res.status(201).json({
       success: true,
       message: 'Business location created successfully',
@@ -29,7 +59,11 @@ export const createBusinessLocationController = async (
     });
   } catch (error: any) {
     console.error('Create Business Location Error:', error);
-
+ await logOrgUnitAction(
+      req,
+      "FAILED_TO_CREATE_BUSINESS_LOCATION",
+      `business_location: ${req.body.locationName }`
+    );
     return res.status(500).json({
       success: false,
       message: error?.message || 'Failed to create business location',
@@ -100,14 +134,22 @@ export const deleteBusinessLocationController = async (
     const id = Number(req.params.id);
 
     const result = await deleteBusinessLoaction(id);
-
+  await logOrgUnitAction(
+      req,
+      "DELETED_BUSINESS_LOCATION",
+      `business_location: ${req.body.locationName }`
+    );
     return res.status(200).json({
       message: "Business location deleted successfully",
       data: result,
     });
   } catch (error: any) {
     const statusCode = error.statusCode || 500;
-
+    await logOrgUnitAction(
+      req,
+      "FAILED_TO_DELETE_BUSINESS_LOCATION",
+      `business_location: ${req.body.locationName }`
+    );
     return res.status(statusCode).json({
       message: statusCode === 404
         ? "Business location not found or already deleted"
@@ -129,12 +171,21 @@ export const updateBusinessLocationController = async (
       id,
       req.body
     );
-
+      await logOrgUnitAction(
+      req,
+      "UPDATED_BUSINESS_LOCATION",
+      `business_location: ${req.body.locationName }`
+    );
     return res.status(200).json({
       message: "Business location updated successfully",
       data: result,
     });
   } catch (error: any) {
+    await logOrgUnitAction(
+      req,
+      "FAILED_TO_UPDATE_BUSINESS_LOCATION",
+      `business_location: ${req.body.locationName }`
+    );
     return res.status(500).json({
       message: "Failed to update business location",
       error: error.message,
