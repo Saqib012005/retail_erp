@@ -6,6 +6,7 @@ interface BusinessLocationTableProps {
   onEdit: (row: BusinessLocationRow) => void
   onDelete: (row: BusinessLocationRow) => void
   loading?: boolean
+  error?: string
 }
 
 export default function BusinessLocationTable({
@@ -13,6 +14,7 @@ export default function BusinessLocationTable({
   onEdit,
   onDelete,
   loading,
+  error,
 }: BusinessLocationTableProps) {
 
 
@@ -40,10 +42,14 @@ export default function BusinessLocationTable({
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-100">
-          {locations.length === 0 ? (
+          {loading || error || locations.length === 0 ? (
             <tr>
               <td colSpan={7} className="px-4 py-8 text-center text-sm text-slate-500">
-                No business locations found
+                {loading
+                  ? 'Loading business locations...'
+                  : error
+                    ? `Failed to load business locations: ${error}`
+                    : 'No business locations found'}
               </td>
             </tr>
           ) : (
@@ -51,7 +57,9 @@ export default function BusinessLocationTable({
               <tr key={row.id} className="text-sm transition-colors hover:bg-slate-50">
                 <td className="px-4 py-4 font-semibold text-slate-800">{row.locationName}</td>
                 {/* // <td className="px-4 py-4 text-slate-500">{row.code}</td> */}
-                <td className="px-4 py-4 text-slate-600">{row.addressLine2}</td>
+                <td className="px-4 py-4 text-slate-600">
+                  {[row.addressLine1, row.addressLine2].filter(Boolean).join(', ')}
+                </td>
                 <td className="px-4 py-4 text-slate-600">{row.city}</td>
                 <td className="px-4 py-4 text-slate-600">
                   {getStateName(row.country, row.state)}</td>

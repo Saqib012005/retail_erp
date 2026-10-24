@@ -1,6 +1,6 @@
 import apiClient from '@/services/apiClient'
 import type { businessLocationFormData } from '@/components/forms/validate.schema'
-import { BusinessLocationRow } from '@/types/admin/organization/businessLocation'
+import type { BusinessLocationRow } from '@/types/admin/organization/businessLocation'
 
 const buildPayload = (data: businessLocationFormData) => ({
   locationName: data.locationName,
@@ -51,7 +51,7 @@ export const updateBusinessLocation = async (
   id: number,
   data: businessLocationFormData
 ) => {
-  const response = await apiClient.patch(
+  const response = await apiClient.put(
     `/api/organization/businessLocation/${id}`,
     buildPayload(data)
   )

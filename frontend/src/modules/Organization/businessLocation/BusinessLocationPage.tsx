@@ -37,6 +37,8 @@ const [selectedLocation, setSelectedLocation] =
 
 const {
   data: locations = [],
+  isLoading,
+  error,
 } = useBusinessLocations()
 
   const filteredLocations = useMemo(() => {
@@ -180,6 +182,8 @@ if (view === 'edit' && selectedLocation) {
         locations={currentLocations}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        loading={isLoading}
+        error={error instanceof Error ? error.message : undefined}
       />
 
       {/* Footer / Pagination */}
