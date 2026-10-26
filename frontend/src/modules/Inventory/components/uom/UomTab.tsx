@@ -119,17 +119,24 @@ export default function UomTab() {
     setUomNameInput('')
   }
 
-  // Filter logic
-  const filterList = (list: Uom[]) => {
+  // Filter logic — pure helper at component scope, all inputs passed as args so
+  // the memos below have no missing dependencies.
+  const applyUomFilters = (list: Uom[], query: string, status: string) => {
     return list.filter((u) => {
-      const matchesSearch = u.name.toLowerCase().includes(searchQuery.toLowerCase())
-      const matchesStatus = statusFilter === 'All' || u.status === statusFilter
+      const matchesSearch = u.name.toLowerCase().includes(query.toLowerCase())
+      const matchesStatus = status === 'All' || u.status === status
       return matchesSearch && matchesStatus
     })
   }
 
-  const filteredCol1 = useMemo(() => filterList(col1Items), [col1Items, searchQuery, statusFilter])
-  const filteredCol2 = useMemo(() => filterList(col2Items), [col2Items, searchQuery, statusFilter])
+  const filteredCol1 = useMemo(
+    () => applyUomFilters(col1Items, searchQuery, statusFilter),
+    [col1Items, searchQuery, statusFilter],
+  )
+  const filteredCol2 = useMemo(
+    () => applyUomFilters(col2Items, searchQuery, statusFilter),
+    [col2Items, searchQuery, statusFilter],
+  )
 
   const totalRecordCount = col1Items.length
 
